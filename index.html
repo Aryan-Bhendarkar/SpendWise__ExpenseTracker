@@ -34,6 +34,9 @@
                 <h2>Add Transaction</h2>
                 <form id="expense-form">
                     <div class="form-group">
+                        <input type="date" id="transaction-date" required>
+                    </div>
+                    <div class="form-group">
                         <input type="text" id="description" placeholder="Description" required>
                     </div>
                     <div class="form-group">
@@ -47,17 +50,90 @@
                     </div>
                     <div class="form-group">
                         <select id="category" required>
-                            <option value="salary">Salary</option>
-                            <option value="food">Food</option>
-                            <option value="transport">Transport</option>
-                            <option value="utilities">Utilities</option>
-                            <option value="entertainment">Entertainment</option>
-                            <option value="shopping">Shopping</option>
-                            <option value="other">Other</option>
+                            <optgroup label="Income Categories">
+                                <option value="salary">Salary</option>
+                                <option value="freelance">Freelance</option>
+                                <option value="investments">Investments</option>
+                                <option value="rental">Rental Income</option>
+                                <option value="business">Business</option>
+                                <option value="other_income">Other Income</option>
+                            </optgroup>
+                            <optgroup label="Essential Expenses">
+                                <option value="rent">Rent/Mortgage</option>
+                                <option value="utilities">Utilities</option>
+                                <option value="groceries">Groceries</option>
+                                <option value="healthcare">Healthcare</option>
+                                <option value="insurance">Insurance</option>
+                            </optgroup>
+                            <optgroup label="Transportation">
+                                <option value="fuel">Fuel</option>
+                                <option value="public_transport">Public Transport</option>
+                                <option value="vehicle_maintenance">Vehicle Maintenance</option>
+                                <option value="parking">Parking</option>
+                            </optgroup>
+                            <optgroup label="Personal">
+                                <option value="shopping">Shopping</option>
+                                <option value="clothing">Clothing</option>
+                                <option value="entertainment">Entertainment</option>
+                                <option value="dining">Dining Out</option>
+                                <option value="personal_care">Personal Care</option>
+                            </optgroup>
+                            <optgroup label="Education & Development">
+                                <option value="education">Education</option>
+                                <option value="books">Books</option>
+                                <option value="courses">Online Courses</option>
+                                <option value="training">Training</option>
+                            </optgroup>
+                            <optgroup label="Savings & Investments">
+                                <option value="savings">Savings</option>
+                                <option value="investments">Investments</option>
+                                <option value="emergency_fund">Emergency Fund</option>
+                            </optgroup>
+                            <optgroup label="Others">
+                                <option value="gifts">Gifts</option>
+                                <option value="donations">Donations</option>
+                                <option value="other">Other</option>
+                            </optgroup>
                         </select>
                     </div>
                     <button type="submit" class="btn-submit">Add Transaction</button>
                 </form>
+            </div>
+
+            <div class="date-filter">
+                <h2>Filter Transactions</h2>
+                <div class="filter-form">
+                    <div class="form-group">
+                        <label for="filter-start-date">From:</label>
+                        <input type="date" id="filter-start-date">
+                    </div>
+                    <div class="form-group">
+                        <label for="filter-end-date">To:</label>
+                        <input type="date" id="filter-end-date">
+                    </div>
+                    <div class="form-group">
+                        <label for="budget-amount">Monthly Budget:</label>
+                        <input type="number" id="budget-amount" placeholder="Set monthly budget">
+                    </div>
+                    <button id="apply-filter" class="btn-filter">Apply Filter</button>
+                </div>
+                <div class="summary-section">
+                    <h3>Monthly Summary</h3>
+                    <div class="summary-stats">
+                        <div class="summary-item">
+                            <span>Budget:</span>
+                            <span id="monthly-budget">$0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Spent:</span>
+                            <span id="monthly-spent">$0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Remaining:</span>
+                            <span id="monthly-remaining">$0</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="currency-converter">
