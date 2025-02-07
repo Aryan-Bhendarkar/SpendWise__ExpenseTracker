@@ -1,6 +1,7 @@
 // Initialize data structure
 let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
 let exchangeRates = {};
+let monthlyBudget = parseFloat(localStorage.getItem('monthlyBudget')) || 0;
 
 // DOM Elements
 const expenseForm = document.getElementById('expense-form');
@@ -9,9 +10,22 @@ const totalIncomeElement = document.getElementById('total-income');
 const totalExpensesElement = document.getElementById('total-expenses');
 const totalSavingsElement = document.getElementById('total-savings');
 const expenseChart = document.getElementById('expense-chart');
+const filterStartDate = document.getElementById('filter-start-date');
+const filterEndDate = document.getElementById('filter-end-date');
+const applyFilterBtn = document.getElementById('apply-filter');
+const budgetAmountInput = document.getElementById('budget-amount');
+const monthlyBudgetElement = document.getElementById('monthly-budget');
+const monthlySpentElement = document.getElementById('monthly-spent');
+const monthlyRemainingElement = document.getElementById('monthly-remaining');
+
+// Set initial dates for filter
+const today = new Date();
+filterStartDate.value = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0];
+filterEndDate.value = new Date(today.getFullYear(), today.getMonth() + 1, 0).toISOString().split('T')[0];
 
 // Initialize Chart
 let chart = null;
+let filteredTransactions = [...transactions];
 
 // Fetch exchange rates
 async function fetchExchangeRates() {
@@ -43,6 +57,7 @@ expenseForm.addEventListener('submit', (e) => {
     const amount = parseFloat(document.getElementById('amount').value);
     const type = document.getElementById('type').value;
     const category = document.getElementById('category').value;
+    const date = document.getElementById('transaction-date').value || new Date().toISOString().split('T')[0];
 
     const transaction = {
         id: Date.now(),
@@ -50,30 +65,45 @@ expenseForm.addEventListener('submit', (e) => {
         amount,
         type,
         category,
-        date: new Date().toISOString()
+        date
     };
 
     transactions.push(transaction);
     localStorage.setItem('transactions', JSON.stringify(transactions));
     
     expenseForm.reset();
+    document.getElementById('transaction-date').value = new Date().toISOString().split('T')[0];
     updateUI();
 });
 
-// Update UI
+// Update UI with filtered transactions
 function updateUI() {
+    applyFilters();
     updateStats();
     updateTransactionsList();
     updateChart();
+    updateBudgetSummary();
 }
 
-// Update statistics
+// Apply date filters
+function applyFilters() {
+    const startDate = new Date(filterStartDate.value);
+    const endDate = new Date(filterEndDate.value);
+    endDate.setHours(23, 59, 59, 999);
+
+    filteredTransactions = transactions.filter(t => {
+        const transactionDate = new Date(t.date);
+        return transactionDate >= startDate && transactionDate <= endDate;
+    });
+}
+
+// Update statistics with filtered transactions
 function updateStats() {
-    const income = transactions
+    const income = filteredTransactions
         .filter(t => t.type === 'income')
         .reduce((sum, t) => sum + t.amount, 0);
     
-    const expenses = transactions
+    const expenses = filteredTransactions
         .filter(t => t.type === 'expense')
         .reduce((sum, t) => sum + t.amount, 0);
     
@@ -92,11 +122,47 @@ function formatCurrency(amount) {
     }).format(amount);
 }
 
-// Update transactions list
+// Update budget summary
+function updateBudgetSummary() {
+    const currentDate = new Date();
+    const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+    const lastDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+
+    const monthlyExpenses = transactions
+        .filter(t => {
+            const transactionDate = new Date(t.date);
+            return t.type === 'expense' && 
+                   transactionDate >= firstDayOfMonth && 
+                   transactionDate <= lastDayOfMonth;
+        })
+        .reduce((sum, t) => sum + t.amount, 0);
+
+    const remaining = monthlyBudget - monthlyExpenses;
+
+    monthlyBudgetElement.textContent = formatCurrency(monthlyBudget);
+    monthlySpentElement.textContent = formatCurrency(monthlyExpenses);
+    monthlyRemainingElement.textContent = formatCurrency(remaining);
+
+    // Update styles based on budget status
+    monthlyRemainingElement.style.color = remaining >= 0 ? 'var(--income-color)' : 'var(--expense-color)';
+}
+
+// Event listeners for filters and budget
+applyFilterBtn.addEventListener('click', updateUI);
+budgetAmountInput.addEventListener('change', () => {
+    monthlyBudget = parseFloat(budgetAmountInput.value) || 0;
+    localStorage.setItem('monthlyBudget', monthlyBudget);
+    updateBudgetSummary();
+});
+
+// Set initial budget value
+budgetAmountInput.value = monthlyBudget;
+
+// Update transactions list with filtered transactions
 function updateTransactionsList() {
     transactionsContainer.innerHTML = '';
     
-    const sortedTransactions = [...transactions].sort((a, b) => 
+    const sortedTransactions = [...filteredTransactions].sort((a, b) => 
         new Date(b.date) - new Date(a.date)
     );
 
@@ -107,7 +173,10 @@ function updateTransactionsList() {
         element.innerHTML = `
             <div>
                 <strong>${transaction.description}</strong>
-                <span>${transaction.category}</span>
+                <div class="transaction-details">
+                    <span class="category">${transaction.category}</span>
+                    <span class="date">${formatDate(transaction.date)}</span>
+                </div>
             </div>
             <div>
                 <span class="amount ${transaction.type === 'expense' ? 'expense-color' : 'income-color'}">
@@ -119,6 +188,12 @@ function updateTransactionsList() {
         
         transactionsContainer.appendChild(element);
     });
+}
+
+// Format date
+function formatDate(dateString) {
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
 }
 
 // Delete transaction
