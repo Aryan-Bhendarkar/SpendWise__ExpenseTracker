@@ -158,6 +158,14 @@ budgetAmountInput.addEventListener('change', () => {
 // Set initial budget value
 budgetAmountInput.value = monthlyBudget;
 
+// Add this helper function at the top of the file
+function capitalizeCategory(category) {
+    // Split by underscore and capitalize each word
+    return category.split('_')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ');
+}
+
 // Update transactions list with filtered transactions
 function updateTransactionsList() {
     transactionsContainer.innerHTML = '';
@@ -171,18 +179,18 @@ function updateTransactionsList() {
         element.className = `transaction-item ${transaction.type}`;
         
         element.innerHTML = `
-            <div>
+            <div class="transaction-details">
                 <strong>${transaction.description}</strong>
-                <div class="transaction-details">
-                    <span class="category">${transaction.category}</span>
+                <div class="transaction-meta">
+                    <span class="category">${capitalizeCategory(transaction.category)}</span>
                     <span class="date">${formatDate(transaction.date)}</span>
                 </div>
             </div>
-            <div>
+            <div class="transaction-amount">
                 <span class="amount ${transaction.type === 'expense' ? 'expense-color' : 'income-color'}">
                     ${transaction.type === 'expense' ? '-' : '+'}${formatCurrency(transaction.amount)}
                 </span>
-                <button onclick="deleteTransaction(${transaction.id})" class="delete-btn">×</button>
+                <button onclick="deleteTransaction(${transaction.id})" class="delete-btn" title="Delete transaction">×</button>
             </div>
         `;
         
@@ -211,15 +219,53 @@ function createChart() {
         chart.destroy();
     }
 
+    // Add heading to chart section
+    const chartSection = document.querySelector('.charts-section');
+    const chartHeading = document.createElement('h2');
+    chartHeading.className = 'chart-title';
+    chartHeading.textContent = 'Expense Breakdown';
+    
+    // Remove existing heading if any
+    const existingHeading = chartSection.querySelector('.chart-title');
+    if (existingHeading) {
+        existingHeading.remove();
+    }
+    chartSection.insertBefore(chartHeading, chartSection.firstChild);
+
     const categoryTotals = transactions
         .filter(t => t.type === 'expense')
         .reduce((acc, t) => {
-            acc[t.category] = (acc[t.category] || 0) + t.amount;
+            acc[capitalizeCategory(t.category)] = (acc[capitalizeCategory(t.category)] || 0) + t.amount;
             return acc;
         }, {});
 
+    const total = Object.values(categoryTotals).reduce((sum, value) => sum + value, 0);
     const labels = Object.keys(categoryTotals);
     const data = Object.values(categoryTotals);
+    const percentages = data.map(value => ((value / total) * 100).toFixed(1));
+
+    const chartColors = [
+        'rgb(255, 99, 132)',    // Pink
+        'rgb(54, 162, 235)',    // Blue
+        'rgb(255, 206, 86)',    // Yellow
+        'rgb(75, 192, 192)',    // Teal
+        'rgb(153, 102, 255)',   // Purple
+        'rgb(255, 159, 64)',    // Orange
+        'rgb(46, 204, 113)',    // Green
+        'rgb(142, 68, 173)',    // Deep Purple
+        'rgb(52, 152, 219)',    // Light Blue
+        'rgb(231, 76, 60)',     // Red
+        'rgb(241, 196, 15)',    // Golden
+        'rgb(230, 126, 34)',    // Carrot Orange
+        'rgb(26, 188, 156)'     // Turquoise
+    ];
+
+    const gradientColors = chartColors.map(color => {
+        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, color);
+        gradient.addColorStop(1, color.replace('rgb', 'rgba').replace(')', ', 0.8)'));
+        return gradient;
+    });
 
     chart = new Chart(ctx, {
         type: 'doughnut',
@@ -227,18 +273,100 @@ function createChart() {
             labels: labels,
             datasets: [{
                 data: data,
-                backgroundColor: [
-                    '#e74c3c', '#3498db', '#2ecc71', '#f1c40f',
-                    '#9b59b6', '#e67e22', '#1abc9c'
-                ]
+                backgroundColor: gradientColors,
+                borderWidth: 0,
+                hoverOffset: 20,
+                spacing: 1
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            cutout: '65%',
+            layout: {
+                padding: {
+                    top: 30,
+                    bottom: 70,
+                    left: 20,
+                    right: 20
+                }
+            },
             plugins: {
                 legend: {
-                    position: 'right'
+                    display: true,
+                    position: 'bottom',
+                    align: 'center',
+                    labels: {
+                        color: function(context) {
+                            // Return the same color as the chart segment
+                            return chartColors[context.dataIndex] || '#FFFFFF';
+                        },
+                        padding: 15,
+                        usePointStyle: true,
+                        pointStyle: 'circle',
+                        font: {
+                            size: 13,
+                            weight: '600',
+                            family: "'Segoe UI', sans-serif"
+                        },
+                        generateLabels: function(chart) {
+                            const data = chart.data;
+                            if (data.labels.length && data.datasets.length) {
+                                return data.labels.map((label, i) => {
+                                    const value = data.datasets[0].data[i];
+                                    const percentage = percentages[i];
+                                    return {
+                                        text: `${label} (${percentage}%)`,
+                                        fillStyle: chartColors[i],
+                                        strokeStyle: chartColors[i],
+                                        lineWidth: 0,
+                                        hidden: false,
+                                        index: i,
+                                        // Add text color to match the segment
+                                        fontColor: chartColors[i]
+                                    };
+                                });
+                            }
+                            return [];
+                        },
+                        boxWidth: 10,
+                        boxHeight: 10
+                    }
+                },
+                tooltip: {
+                    enabled: true,
+                    backgroundColor: 'rgba(0, 0, 0, 0.85)',
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    titleFont: {
+                        size: 14,
+                        weight: 'bold'
+                    },
+                    bodyFont: {
+                        size: 13
+                    },
+                    padding: 15,
+                    cornerRadius: 10,
+                    displayColors: true,
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = formatCurrency(context.raw);
+                            const percentage = percentages[context.dataIndex];
+                            return ` ${label}: ${value} (${percentage}%)`;
+                        }
+                    }
+                }
+            },
+            animation: {
+                animateScale: true,
+                animateRotate: true,
+                duration: 1000,
+                easing: 'easeInOutQuart'
+            },
+            elements: {
+                arc: {
+                    borderRadius: 4
                 }
             }
         }
