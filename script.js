@@ -30,11 +30,38 @@ let filteredTransactions = [...transactions];
 // Fetch exchange rates
 async function fetchExchangeRates() {
     try {
-        const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+        // Using a different free API endpoint
+        const response = await fetch('https://open.er-api.com/v6/latest/INR');
         const data = await response.json();
-        exchangeRates = data.rates;
+        
+        if (data && data.rates) {
+            exchangeRates = data.rates;
+            // Set INR rate explicitly
+            exchangeRates['INR'] = 1;
+            console.log('Exchange rates loaded successfully');
+        } else {
+            throw new Error('Invalid API response format');
+        }
     } catch (error) {
         console.error('Error fetching exchange rates:', error);
+        // Set some default rates for basic functionality
+        exchangeRates = {
+            'INR': 1,
+            'USD': 0.012,
+            'EUR': 0.011,
+            'GBP': 0.0095,
+            'JPY': 1.78,
+            'AUD': 0.018,
+            'CAD': 0.016,
+            'CHF': 0.011,
+            'CNY': 0.086,
+            'SGD': 0.016,
+            'AED': 0.044,
+            'NZD': 0.020,
+            'SAR': 0.045
+        };
+        // Show error message to user
+        conversionResult.textContent = 'Using offline exchange rates. Please check your internet connection.';
     }
 }
 
@@ -116,9 +143,11 @@ function updateStats() {
 
 // Format currency
 function formatCurrency(amount) {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-IN', {
         style: 'currency',
-        currency: 'USD'
+        currency: 'INR',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
     }).format(amount);
 }
 
@@ -380,6 +409,32 @@ const convertAmount = document.getElementById('convert-amount');
 const fromCurrency = document.getElementById('from-currency');
 const toCurrency = document.getElementById('to-currency');
 
+// Currency conversion calculation
+function convertCurrency(amount, fromCurrency, toCurrency) {
+    try {
+        if (!exchangeRates[fromCurrency] || !exchangeRates[toCurrency]) {
+            throw new Error('Invalid currency');
+        }
+        
+        // For INR to other currency
+        if (fromCurrency === 'INR') {
+            return amount * exchangeRates[toCurrency];
+        }
+        // For other currency to INR
+        else if (toCurrency === 'INR') {
+            return amount / exchangeRates[fromCurrency];
+        }
+        // For other currency to other currency
+        else {
+            const amountInINR = amount / exchangeRates[fromCurrency];
+            return amountInINR * exchangeRates[toCurrency];
+        }
+    } catch (error) {
+        console.error('Conversion error:', error);
+        return 0;
+    }
+}
+
 // Function to perform currency conversion
 function performConversion() {
     const amount = parseFloat(convertAmount.value) || 0;
@@ -391,18 +446,31 @@ function performConversion() {
         return;
     }
 
-    const convertedAmount = convertCurrency(amount, from, to);
-    const formattedAmount = new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: from
-    }).format(amount);
-    
-    const formattedResult = new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: to
-    }).format(convertedAmount);
+    try {
+        const convertedAmount = convertCurrency(amount, from, to);
+        if (convertedAmount === 0) {
+            throw new Error('Conversion failed');
+        }
 
-    conversionResult.textContent = `${formattedAmount} = ${formattedResult}`;
+        const formattedAmount = new Intl.NumberFormat('en-IN', {
+            style: 'currency',
+            currency: from,
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2
+        }).format(amount);
+        
+        const formattedResult = new Intl.NumberFormat('en-IN', {
+            style: 'currency',
+            currency: to,
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2
+        }).format(convertedAmount);
+
+        conversionResult.textContent = `${formattedAmount} = ${formattedResult}`;
+    } catch (error) {
+        console.error('Conversion display error:', error);
+        conversionResult.textContent = 'Currency conversion failed. Please try again.';
+    }
 }
 
 // Add event listeners for currency conversion
@@ -410,13 +478,6 @@ convertBtn.addEventListener('click', performConversion);
 convertAmount.addEventListener('input', performConversion);
 fromCurrency.addEventListener('change', performConversion);
 toCurrency.addEventListener('change', performConversion);
-
-// Currency conversion calculation
-function convertCurrency(amount, fromCurrency, toCurrency) {
-    const fromRate = exchangeRates[fromCurrency];
-    const toRate = exchangeRates[toCurrency];
-    return (amount / fromRate) * toRate;
-}
 
 // Update chart when transactions change
 function updateChart() {
