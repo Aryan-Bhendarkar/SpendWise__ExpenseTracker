@@ -29,6 +29,10 @@ async function init() {
     await fetchExchangeRates();
     updateUI();
     createChart();
+    
+    // Set default amount for currency converter
+    convertAmount.value = 1;
+    performConversion(); // Trigger initial conversion
 }
 
 // Add transaction
@@ -169,20 +173,40 @@ function createChart() {
 // Currency converter functionality
 const convertBtn = document.getElementById('convert-btn');
 const conversionResult = document.getElementById('conversion-result');
+const convertAmount = document.getElementById('convert-amount');
+const fromCurrency = document.getElementById('from-currency');
+const toCurrency = document.getElementById('to-currency');
 
-convertBtn.addEventListener('click', () => {
-    const amount = parseFloat(document.getElementById('convert-amount').value);
-    const fromCurrency = document.getElementById('from-currency').value;
-    const toCurrency = document.getElementById('to-currency').value;
+// Function to perform currency conversion
+function performConversion() {
+    const amount = parseFloat(convertAmount.value) || 0;
+    const from = fromCurrency.value;
+    const to = toCurrency.value;
 
-    if (isNaN(amount)) {
-        conversionResult.textContent = 'Please enter a valid amount';
+    if (amount === 0) {
+        conversionResult.textContent = 'Please enter an amount';
         return;
     }
 
-    const convertedAmount = convertCurrency(amount, fromCurrency, toCurrency);
-    conversionResult.textContent = `${amount} ${fromCurrency} = ${convertedAmount.toFixed(2)} ${toCurrency}`;
-});
+    const convertedAmount = convertCurrency(amount, from, to);
+    const formattedAmount = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: from
+    }).format(amount);
+    
+    const formattedResult = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: to
+    }).format(convertedAmount);
+
+    conversionResult.textContent = `${formattedAmount} = ${formattedResult}`;
+}
+
+// Add event listeners for currency conversion
+convertBtn.addEventListener('click', performConversion);
+convertAmount.addEventListener('input', performConversion);
+fromCurrency.addEventListener('change', performConversion);
+toCurrency.addEventListener('change', performConversion);
 
 // Currency conversion calculation
 function convertCurrency(amount, fromCurrency, toCurrency) {
