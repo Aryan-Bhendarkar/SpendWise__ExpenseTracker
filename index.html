@@ -4,14 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Budget - Personal Expense Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Smart Budget</h1>
-            <p class="subtitle">Track, Convert, Analyze</p>
+            <h1>Spend<span class="wise-gradient" data-text="Wise">Wise</span></h1>
+            <div class="subtitle-container">
+                <p class="subtitle">Track Smart, Save Smarter</p>
+            </div>
         </header>
 
         <div class="stats-container">
@@ -122,15 +127,15 @@
                     <div class="summary-stats">
                         <div class="summary-item">
                             <span>Budget:</span>
-                            <span id="monthly-budget">$0</span>
+                            <span id="monthly-budget">₹0</span>
                         </div>
                         <div class="summary-item">
                             <span>Spent:</span>
-                            <span id="monthly-spent">$0</span>
+                            <span id="monthly-spent">₹0</span>
                         </div>
                         <div class="summary-item">
                             <span>Remaining:</span>
-                            <span id="monthly-remaining">$0</span>
+                            <span id="monthly-remaining">₹0</span>
                         </div>
                     </div>
                 </div>
