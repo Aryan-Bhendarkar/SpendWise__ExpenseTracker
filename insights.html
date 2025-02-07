@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpendWise - Financial Insights</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="insights.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Spend<span class="wise-gradient" data-text="Wise">Wise</span></h1>
+            <div class="subtitle-container">
+                <p class="subtitle">Financial Insights & Analytics</p>
+            </div>
+            <nav class="main-nav">
+                <a href="index.html" class="nav-link">Dashboard</a>
+                <a href="insights.html" class="nav-link active">Insights</a>
+            </nav>
+        </header>
+
+        <div class="insights-grid">
+            <!-- Financial Health Score Section -->
+            <div class="health-score-section">
+                <h2>Financial Health Score</h2>
+                <div class="score-container">
+                    <div class="score-circle">
+                        <div class="score-value">
+                            <span id="healthScore">0</span>
+                            <span class="score-label">Score</span>
+                        </div>
+                    </div>
+                    <div class="score-details">
+                        <div class="score-factor">
+                            <span>Savings Ratio</span>
+                            <div class="progress-bar">
+                                <div class="progress" id="savingsProgress"></div>
+                            </div>
+                        </div>
+                        <div class="score-factor">
+                            <span>Budget Adherence</span>
+                            <div class="progress-bar">
+                                <div class="progress" id="budgetProgress"></div>
+                            </div>
+                        </div>
+                        <div class="score-factor">
+                            <span>Essential Spending</span>
+                            <div class="progress-bar">
+                                <div class="progress" id="essentialProgress"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="health-recommendations">
+                    <h3>Recommendations</h3>
+                    <ul id="recommendationsList">
+                        <!-- Recommendations will be added dynamically -->
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Smart Analytics Section -->
+            <div class="analytics-section">
+                <h2>Spending Analytics</h2>
+                <div class="analytics-grid">
+                    <!-- Monthly Comparison Chart -->
+                    <div class="chart-card">
+                        <h3>Monthly Comparison</h3>
+                        <canvas id="monthlyComparisonChart"></canvas>
+                    </div>
+                    
+                    <!-- Spending Pattern Chart -->
+                    <div class="chart-card">
+                        <h3>Spending Patterns</h3>
+                        <canvas id="spendingPatternChart"></canvas>
+                    </div>
+
+                    <!-- Expense Prediction -->
+                    <div class="prediction-card">
+                        <h3>Next Month Prediction</h3>
+                        <div class="prediction-details" id="predictionDetails">
+                            <!-- Predictions will be added dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Category Insights -->
+                    <div class="insights-card">
+                        <h3>Category Insights</h3>
+                        <div class="insights-list" id="categoryInsights">
+                            <!-- Insights will be added dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="insights.js"></script>
+</body>
+</html> 

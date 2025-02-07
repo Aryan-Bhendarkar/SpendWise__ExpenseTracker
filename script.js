@@ -1,7 +1,223 @@
+// Initialize data structure with sample data
+let transactions = [];
+
+// Helper function to get date for previous months
+function getDateForMonth(monthsAgo) {
+    const date = new Date('2025-02-15'); // Set base date to February 2025
+    date.setMonth(date.getMonth() - monthsAgo);
+    return date.toISOString().split('T')[0];
+}
+
+// Add sample transactions for last 3 months (December 2024, January 2025, February 2025)
+transactions = [
+    // February 2025 (Current Month)
+    {
+        id: 1,
+        date: getDateForMonth(0),
+        description: 'Monthly Salary',
+        amount: 20000,
+        type: 'income',
+        category: 'salary'
+    },
+    {
+        id: 2,
+        date: getDateForMonth(0),
+        description: 'House Rent',
+        amount: 6000,
+        type: 'expense',
+        category: 'rent'
+    },
+    {
+        id: 3,
+        date: getDateForMonth(0),
+        description: 'Groceries - Big Basket',
+        amount: 3500,
+        type: 'expense',
+        category: 'groceries'
+    },
+    {
+        id: 4,
+        date: getDateForMonth(0),
+        description: 'Electricity Bill',
+        amount: 800,
+        type: 'expense',
+        category: 'utilities'
+    },
+    {
+        id: 5,
+        date: getDateForMonth(0),
+        description: 'Mobile & Internet',
+        amount: 700,
+        type: 'expense',
+        category: 'utilities'
+    },
+    {
+        id: 6,
+        date: getDateForMonth(0),
+        description: 'Local Transport',
+        amount: 1200,
+        type: 'expense',
+        category: 'transportation'
+    },
+    {
+        id: 7,
+        date: getDateForMonth(0),
+        description: 'Movie & Dinner',
+        amount: 1000,
+        type: 'expense',
+        category: 'entertainment'
+    },
+    {
+        id: 8,
+        date: getDateForMonth(0),
+        description: 'Medical Checkup',
+        amount: 500,
+        type: 'expense',
+        category: 'healthcare'
+    },
+
+    // January 2025
+    {
+        id: 9,
+        date: getDateForMonth(1),
+        description: 'Monthly Salary',
+        amount: 20000,
+        type: 'income',
+        category: 'salary'
+    },
+    {
+        id: 10,
+        date: getDateForMonth(1),
+        description: 'House Rent',
+        amount: 6000,
+        type: 'expense',
+        category: 'rent'
+    },
+    {
+        id: 11,
+        date: getDateForMonth(1),
+        description: 'Groceries',
+        amount: 3200,
+        type: 'expense',
+        category: 'groceries'
+    },
+    {
+        id: 12,
+        date: getDateForMonth(1),
+        description: 'Electricity Bill',
+        amount: 900,
+        type: 'expense',
+        category: 'utilities'
+    },
+    {
+        id: 13,
+        date: getDateForMonth(1),
+        description: 'Mobile Recharge',
+        amount: 700,
+        type: 'expense',
+        category: 'utilities'
+    },
+    {
+        id: 14,
+        date: getDateForMonth(1),
+        description: 'Bus Pass',
+        amount: 1100,
+        type: 'expense',
+        category: 'transportation'
+    },
+    {
+        id: 15,
+        date: getDateForMonth(1),
+        description: 'Restaurant',
+        amount: 800,
+        type: 'expense',
+        category: 'entertainment'
+    },
+    {
+        id: 16,
+        date: getDateForMonth(1),
+        description: 'Medicines',
+        amount: 400,
+        type: 'expense',
+        category: 'healthcare'
+    },
+
+    // December 2024
+    {
+        id: 17,
+        date: getDateForMonth(2),
+        description: 'Monthly Salary',
+        amount: 20000,
+        type: 'income',
+        category: 'salary'
+    },
+    {
+        id: 18,
+        date: getDateForMonth(2),
+        description: 'House Rent',
+        amount: 6000,
+        type: 'expense',
+        category: 'rent'
+    },
+    {
+        id: 19,
+        date: getDateForMonth(2),
+        description: 'Monthly Groceries',
+        amount: 3800,
+        type: 'expense',
+        category: 'groceries'
+    },
+    {
+        id: 20,
+        date: getDateForMonth(2),
+        description: 'Electricity',
+        amount: 850,
+        type: 'expense',
+        category: 'utilities'
+    },
+    {
+        id: 21,
+        date: getDateForMonth(2),
+        description: 'Internet Bill',
+        amount: 700,
+        type: 'expense',
+        category: 'utilities'
+    },
+    {
+        id: 22,
+        date: getDateForMonth(2),
+        description: 'Transport',
+        amount: 1300,
+        type: 'expense',
+        category: 'transportation'
+    },
+    {
+        id: 23,
+        date: getDateForMonth(2),
+        description: 'Weekend Movie',
+        amount: 600,
+        type: 'expense',
+        category: 'entertainment'
+    },
+    {
+        id: 24,
+        date: getDateForMonth(2),
+        description: 'Health Checkup',
+        amount: 1200,
+        type: 'expense',
+        category: 'healthcare'
+    }
+];
+
+// Set a realistic monthly budget
+let monthlyBudget = 15000;
+
+// Store in localStorage
+localStorage.setItem('transactions', JSON.stringify(transactions));
+localStorage.setItem('monthlyBudget', monthlyBudget);
+
 // Initialize data structure
-let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
 let exchangeRates = {};
-let monthlyBudget = parseFloat(localStorage.getItem('monthlyBudget')) || 0;
 
 // DOM Elements
 const expenseForm = document.getElementById('expense-form');
