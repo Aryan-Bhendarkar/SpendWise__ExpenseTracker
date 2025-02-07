@@ -23,9 +23,10 @@ function loadData() {
 function calculateHealthScore() {
     if (transactions.length === 0) return 0;
 
-    // Get last 3 months transactions
-    const threeMonthsAgo = new Date('2025-02-15');  // Base date
-    threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+    // Get last 3 months transactions using current date
+    const today = new Date();
+    const threeMonthsAgo = new Date(today);
+    threeMonthsAgo.setMonth(today.getMonth() - 3);
 
     const recentTransactions = transactions.filter(t => {
         const tDate = new Date(t.date);
@@ -128,9 +129,10 @@ function generateRecommendations() {
     const recommendations = [];
     const score = calculateHealthScore();
 
-    // Get last 3 months data for better analysis
-    const threeMonthsAgo = new Date('2025-02-15');
-    threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+    // Get last 3 months data using current date
+    const today = new Date();
+    const threeMonthsAgo = new Date(today);
+    threeMonthsAgo.setMonth(today.getMonth() - 3);
 
     const recentTransactions = transactions.filter(t => {
         const tDate = new Date(t.date);
@@ -158,37 +160,67 @@ function generateRecommendations() {
     const essentialRatio = monthlyExpenses > 0 ? essentialExpenses / monthlyExpenses : 0;
     const overBudget = monthlyExpenses > monthlyBudget;
 
+    // Analyze spending trends
+    const monthlyData = getMonthlyData();
+    const expenseTrend = calculateTrend(monthlyData.expenses);
+    const incomeTrend = calculateTrend(monthlyData.income);
+
+    // Add trend-based recommendations
+    if (expenseTrend > 0.1) {
+        recommendations.push(`Your expenses have increased by ${(expenseTrend * 100).toFixed(1)}% over the last 3 months. Consider reviewing your spending patterns.`);
+    } else if (expenseTrend < -0.1) {
+        recommendations.push(`Great job! Your expenses have decreased by ${Math.abs(expenseTrend * 100).toFixed(1)}% over the last 3 months.`);
+    }
+
+    if (incomeTrend < -0.05) {
+        recommendations.push(`Your income has decreased by ${Math.abs(incomeTrend * 100).toFixed(1)}%. Consider exploring additional income sources or discussing a raise.`);
+    }
+
+    // Analyze category-specific trends
+    const categoryTrends = analyzeCategoryTrends(recentTransactions);
+    const highestIncrease = categoryTrends.sort((a, b) => b.trend - a.trend)[0];
+    if (highestIncrease && highestIncrease.trend > 0.2) {
+        recommendations.push(`${capitalizeCategory(highestIncrease.category)} expenses have increased significantly. Consider setting a specific budget for this category.`);
+    }
+
     // Base recommendations on specific financial metrics
     if (savingsRatio < 0.2) {
-        recommendations.push(`Your current savings rate is ${(savingsRatio * 100).toFixed(1)}%. Aim to save at least 20% of your income (${formatCurrency(monthlyIncome * 0.2)} per month).`);
+        const targetSavings = monthlyIncome * 0.2;
+        const additionalSavingsNeeded = targetSavings - monthlySavings;
+        recommendations.push(`Your current savings rate is ${(savingsRatio * 100).toFixed(1)}%. To reach the recommended 20% savings rate, try to save an additional ${formatCurrency(additionalSavingsNeeded)} per month.`);
     }
 
     if (overBudget) {
         const overspentAmount = monthlyExpenses - monthlyBudget;
-        recommendations.push(`You're over budget by ${formatCurrency(overspentAmount)}. Try to reduce monthly expenses by this amount.`);
+        const topExpenseCategories = getTopExpenseCategories(recentTransactions, 3);
+        recommendations.push(`You're over budget by ${formatCurrency(overspentAmount)}. Consider reducing spending in your top expense categories: ${topExpenseCategories.join(', ')}.`);
     }
 
     if (essentialRatio > 0.6) {
-        recommendations.push(`Essential expenses are ${(essentialRatio * 100).toFixed(1)}% of your spending. Try to reduce them to 50-60% of total expenses.`);
+        const excessEssential = (essentialRatio - 0.6) * monthlyExpenses;
+        recommendations.push(`Essential expenses are ${(essentialRatio * 100).toFixed(1)}% of your spending. Try to reduce them by ${formatCurrency(excessEssential)} to reach the recommended 60% threshold.`);
     } else if (essentialRatio < 0.5) {
-        recommendations.push(`Essential expenses are only ${(essentialRatio * 100).toFixed(1)}% of spending. Consider if you're accounting for all essential needs.`);
+        recommendations.push(`Essential expenses are only ${(essentialRatio * 100).toFixed(1)}% of spending. Review if you're accounting for all essential needs like insurance and healthcare.`);
     }
 
     // Score-based additional recommendations
     if (score < 50) {
-        recommendations.push('Create a stricter budget and track expenses daily.');
-        recommendations.push('Look for areas to reduce non-essential spending.');
-        recommendations.push('Consider ways to increase your income.');
+        recommendations.push('Create a detailed budget breakdown for each category and track expenses daily.');
+        recommendations.push(`Focus on reducing spending in non-essential categories: ${getNonEssentialCategories(recentTransactions).join(', ')}.`);
+        recommendations.push('Consider automating your savings by setting up automatic transfers on payday.');
     } else if (score < 75) {
         if (!overBudget) {
-            recommendations.push('Good job staying within budget! Consider saving the surplus.');
+            const surplus = monthlyBudget - monthlyExpenses;
+            recommendations.push(`You're under budget by ${formatCurrency(surplus)}! Consider allocating this surplus to your emergency fund or investments.`);
         }
-        recommendations.push('Build an emergency fund of 3-6 months of expenses.');
-        recommendations.push('Research ways to optimize your essential expenses.');
+        recommendations.push('Build an emergency fund targeting 3-6 months of expenses: ' + formatCurrency(monthlyExpenses * 6));
+        if (essentialRatio > 0.5) {
+            recommendations.push('Research ways to optimize your essential expenses through better plans or providers.');
+        }
     } else {
-        recommendations.push('Consider investing your surplus savings for long-term growth.');
-        recommendations.push('Look into tax-saving investment options.');
-        recommendations.push('Consider setting long-term financial goals like retirement planning.');
+        recommendations.push(`With your healthy financial score of ${score}, consider investing in diversified portfolios for long-term growth.`);
+        recommendations.push('Look into tax-saving investment options to optimize your finances further.');
+        recommendations.push('Consider setting up multiple savings goals for different life objectives.');
     }
 
     // Display recommendations
@@ -206,8 +238,66 @@ function generateRecommendations() {
         monthlyExpenses: formatCurrency(monthlyExpenses),
         savingsRatio: (savingsRatio * 100).toFixed(1) + '%',
         essentialRatio: (essentialRatio * 100).toFixed(1) + '%',
+        expenseTrend: (expenseTrend * 100).toFixed(1) + '%',
+        incomeTrend: (incomeTrend * 100).toFixed(1) + '%',
         recommendations
     });
+}
+
+// Helper function to calculate trend (percentage change)
+function calculateTrend(data) {
+    if (data.length < 2) return 0;
+    const oldValue = data[0];
+    const newValue = data[data.length - 1];
+    return oldValue === 0 ? 0 : (newValue - oldValue) / oldValue;
+}
+
+// Helper function to analyze category trends
+function analyzeCategoryTrends(transactions) {
+    const categories = [...new Set(transactions.map(t => t.category))];
+    const monthlyTotals = {};
+
+    // Calculate monthly totals for each category
+    transactions.forEach(t => {
+        const date = new Date(t.date);
+        const monthKey = `${date.getFullYear()}-${date.getMonth()}`;
+        if (!monthlyTotals[monthKey]) {
+            monthlyTotals[monthKey] = {};
+        }
+        monthlyTotals[monthKey][t.category] = (monthlyTotals[monthKey][t.category] || 0) + t.amount;
+    });
+
+    const monthKeys = Object.keys(monthlyTotals).sort();
+    return categories.map(category => {
+        const firstMonth = monthlyTotals[monthKeys[0]][category] || 0;
+        const lastMonth = monthlyTotals[monthKeys[monthKeys.length - 1]][category] || 0;
+        const trend = firstMonth === 0 ? 0 : (lastMonth - firstMonth) / firstMonth;
+        return { category, trend };
+    });
+}
+
+// Helper function to get top expense categories
+function getTopExpenseCategories(transactions, limit = 3) {
+    const categoryTotals = transactions
+        .filter(t => t.type === 'expense')
+        .reduce((acc, t) => {
+            acc[t.category] = (acc[t.category] || 0) + t.amount;
+            return acc;
+        }, {});
+
+    return Object.entries(categoryTotals)
+        .sort(([, a], [, b]) => b - a)
+        .slice(0, limit)
+        .map(([category]) => capitalizeCategory(category));
+}
+
+// Helper function to get non-essential categories
+function getNonEssentialCategories(transactions) {
+    const essentialCategories = ['rent', 'utilities', 'groceries', 'healthcare', 'insurance'];
+    const categories = [...new Set(transactions
+        .filter(t => t.type === 'expense' && !essentialCategories.includes(t.category))
+        .map(t => capitalizeCategory(t.category)))];
+    return categories.slice(0, 3); // Return top 3 non-essential categories
 }
 
 // Create health score display
@@ -239,7 +329,7 @@ function getMonthlyData() {
     
     // Get previous 3 months from today
     for (let i = 3; i > 0; i--) {
-        const date = new Date();
+        const date = new Date(today);
         date.setMonth(today.getMonth() - i);
         targetMonths.push({
             month: date.getMonth(),
@@ -501,22 +591,21 @@ function formatCurrency(amount) {
 
 // Generate predictions for next month
 function generatePredictions() {
-    // Use the latest transaction date as reference instead of current date
-    const latestTransaction = [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date))[0];
-    const referenceDate = latestTransaction ? new Date(latestTransaction.date) : new Date('2025-02-15');
-    
-    const threeMonthsAgo = new Date(referenceDate);
-    threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+    // Use current date as reference
+    const today = new Date();
+    const threeMonthsAgo = new Date(today);
+    threeMonthsAgo.setMonth(today.getMonth() - 3);
     
     // Get the most recent monthly income (latest month)
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+    
     const latestMonthIncome = transactions
         .filter(t => {
             const date = new Date(t.date);
-            const latestMonth = referenceDate.getMonth();
-            const latestYear = referenceDate.getFullYear();
             return t.type === 'income' && 
-                   date.getMonth() === latestMonth &&
-                   date.getFullYear() === latestYear;
+                   date.getMonth() === currentMonth &&
+                   date.getFullYear() === currentYear;
         })
         .reduce((sum, t) => sum + t.amount, 0);
     
@@ -603,25 +692,120 @@ function generatePredictions() {
 
 // Generate category insights
 function generateInsights() {
-    const categoryTotals = transactions
-        .filter(t => t.type === 'expense')
-        .reduce((acc, t) => {
-            const category = t.category;
-            acc[category] = (acc[category] || 0) + t.amount;
-            return acc;
-        }, {});
-        
-    const totalExpenses = Object.values(categoryTotals).reduce((sum, amount) => sum + amount, 0);
+    // Get transactions from last 3 months for better analysis
+    const today = new Date();
+    const threeMonthsAgo = new Date(today);
+    threeMonthsAgo.setMonth(today.getMonth() - 3);
+
+    const recentTransactions = transactions.filter(t => {
+        const tDate = new Date(t.date);
+        return t.type === 'expense' && tDate >= threeMonthsAgo;
+    });
+
+    // Calculate category totals and trends
+    const categoryAnalysis = {};
+    const monthlyTotals = {};
+    const weekdayPatterns = {};
+    const timeOfDayPatterns = {};
+
+    recentTransactions.forEach(t => {
+        const category = t.category;
+        const date = new Date(t.date);
+        const monthKey = `${date.getFullYear()}-${date.getMonth()}`;
+        const weekday = date.getDay();
+        const hour = date.getHours();
+
+        // Initialize category analysis
+        if (!categoryAnalysis[category]) {
+            categoryAnalysis[category] = {
+                total: 0,
+                count: 0,
+                maxAmount: 0,
+                minAmount: Infinity,
+                monthlyTotals: {},
+                weekdayTotals: Array(7).fill(0),
+                timeOfDayTotals: Array(24).fill(0),
+                transactions: [],
+                regularityScore: 0
+            };
+        }
+
+        // Update category analysis
+        categoryAnalysis[category].total += t.amount;
+        categoryAnalysis[category].count++;
+        categoryAnalysis[category].maxAmount = Math.max(categoryAnalysis[category].maxAmount, t.amount);
+        categoryAnalysis[category].minAmount = Math.min(categoryAnalysis[category].minAmount, t.amount);
+        categoryAnalysis[category].weekdayTotals[weekday] += t.amount;
+        categoryAnalysis[category].timeOfDayTotals[hour] += t.amount;
+        categoryAnalysis[category].transactions.push({
+            amount: t.amount,
+            date: date,
+            description: t.description
+        });
+
+        // Track monthly totals
+        if (!categoryAnalysis[category].monthlyTotals[monthKey]) {
+            categoryAnalysis[category].monthlyTotals[monthKey] = 0;
+        }
+        categoryAnalysis[category].monthlyTotals[monthKey] += t.amount;
+
+        // Track overall monthly totals
+        if (!monthlyTotals[monthKey]) {
+            monthlyTotals[monthKey] = 0;
+        }
+        monthlyTotals[monthKey] += t.amount;
+    });
+
+    const totalExpenses = Object.values(categoryAnalysis).reduce((sum, cat) => sum + cat.total, 0);
     
-    const insights = Object.entries(categoryTotals)
-        .map(([category, amount]) => ({
-            category: capitalizeCategory(category),
-            percentage: ((amount / totalExpenses) * 100).toFixed(1),
-            amount
-        }))
-        .sort((a, b) => b.amount - a.amount)
-        .slice(0, 5);
+    // Calculate advanced insights for each category
+    const insights = Object.entries(categoryAnalysis).map(([category, analysis]) => {
+        const percentage = (analysis.total / totalExpenses) * 100;
+        const avgTransactionAmount = analysis.total / analysis.count;
         
+        // Calculate month-over-month trend
+        const monthlyAmounts = Object.values(analysis.monthlyTotals);
+        const trend = calculateTrend(monthlyAmounts);
+
+        // Calculate frequency (transactions per month)
+        const transactionsPerMonth = analysis.count / 3;
+
+        // Analyze spending patterns
+        const patterns = analyzeSpendingPatterns(analysis);
+        
+        // Calculate spending regularity score (0-100)
+        const regularityScore = calculateRegularityScore(analysis);
+
+        // Identify potential savings opportunities
+        const savingsOpportunities = identifySavingsOpportunities(analysis, avgTransactionAmount, patterns);
+
+        // Generate smart recommendations
+        const smartRecommendations = generateSmartRecommendations(
+            category,
+            analysis,
+            patterns,
+            regularityScore,
+            trend,
+            avgTransactionAmount
+        );
+
+        return {
+            category: capitalizeCategory(category),
+            percentage: percentage.toFixed(1),
+            amount: analysis.total,
+            avgAmount: avgTransactionAmount,
+            maxAmount: analysis.maxAmount,
+            minAmount: analysis.minAmount,
+            frequency: transactionsPerMonth,
+            trend: trend,
+            patterns: patterns,
+            regularityScore: regularityScore,
+            savingsOpportunities: savingsOpportunities,
+            recommendations: smartRecommendations
+        };
+    }).sort((a, b) => b.amount - a.amount)
+      .slice(0, 5);
+
     const insightsList = document.getElementById('categoryInsights');
     insightsList.innerHTML = insights
         .map(insight => `
@@ -630,23 +814,232 @@ function generateInsights() {
                     <span class="insight-category">${insight.category}</span>
                     <span class="insight-percentage">${insight.percentage}%</span>
                 </div>
-                <p class="insight-message">
-                    ${getInsightMessage(insight.category, insight.percentage)}
-                </p>
+                <div class="insight-details">
+                    <p class="insight-amount">Total: ${formatCurrency(insight.amount)}</p>
+                    <p class="insight-frequency">Frequency: ${insight.frequency.toFixed(1)} times/month</p>
+                    <p class="insight-trend ${insight.trend > 0 ? 'increasing' : insight.trend < 0 ? 'decreasing' : 'stable'}">
+                        Trend: ${Math.abs(insight.trend * 100).toFixed(1)}% ${insight.trend > 0 ? '↑' : insight.trend < 0 ? '↓' : '→'}
+                    </p>
+                    <p class="insight-regularity">Regularity Score: ${insight.regularityScore.toFixed(0)}/100</p>
+                </div>
+                <div class="insight-patterns">
+                    <h4>Spending Patterns</h4>
+                    <ul>
+                        ${insight.patterns.map(pattern => `<li>${pattern}</li>`).join('')}
+                    </ul>
+                </div>
+                <div class="insight-recommendations">
+                    <h4>Smart Recommendations</h4>
+                    <ul>
+                        ${insight.recommendations.map(rec => `<li>${rec}</li>`).join('')}
+                    </ul>
+                </div>
+                ${insight.savingsOpportunities.length > 0 ? `
+                    <div class="savings-opportunities">
+                        <h4>Savings Opportunities</h4>
+                        <ul>
+                            ${insight.savingsOpportunities.map(opp => `<li>${opp}</li>`).join('')}
+                        </ul>
+                    </div>
+                ` : ''}
             </div>
         `)
         .join('');
 }
 
-// Helper function to get insight messages
-function getInsightMessage(category, percentage) {
-    if (percentage > 30) {
-        return `High spending in ${category}. Consider setting a budget for this category.`;
-    } else if (percentage > 20) {
-        return `Moderate spending in ${category}. Monitor this category for potential savings.`;
-    } else {
-        return `Healthy spending level in ${category}. Keep maintaining this pattern.`;
+// Analyze spending patterns for a category
+function analyzeSpendingPatterns(analysis) {
+    const patterns = [];
+    
+    // Analyze weekday patterns
+    const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const topWeekday = analysis.weekdayTotals
+        .map((amount, index) => ({ day: weekdays[index], amount }))
+        .sort((a, b) => b.amount - a.amount)[0];
+    
+    if (topWeekday.amount > 0) {
+        patterns.push(`Highest spending on ${topWeekday.day}s`);
     }
+
+    // Analyze time of day patterns
+    const timeRanges = [
+        { name: 'morning (6-11)', start: 6, end: 11 },
+        { name: 'afternoon (12-17)', start: 12, end: 17 },
+        { name: 'evening (18-23)', start: 18, end: 23 },
+        { name: 'night (0-5)', start: 0, end: 5 }
+    ];
+
+    const timeRangeTotals = timeRanges.map(range => {
+        const total = analysis.timeOfDayTotals
+            .slice(range.start, range.end + 1)
+            .reduce((sum, amount) => sum + amount, 0);
+        return { name: range.name, total };
+    });
+
+    const topTimeRange = timeRangeTotals.sort((a, b) => b.total - a.total)[0];
+    if (topTimeRange.total > 0) {
+        patterns.push(`Most transactions during ${topTimeRange.name}`);
+    }
+
+    // Analyze transaction size patterns
+    const transactions = analysis.transactions.sort((a, b) => b.amount - a.amount);
+    const largeTransactions = transactions.filter(t => t.amount > analysis.avgAmount * 1.5);
+    if (largeTransactions.length > 0) {
+        patterns.push(`${largeTransactions.length} large transactions (>50% above average)`);
+    }
+
+    // Analyze spending consistency
+    const monthlyAmounts = Object.values(analysis.monthlyTotals);
+    const monthlyVariation = calculateVariation(monthlyAmounts);
+    if (monthlyVariation < 0.1) {
+        patterns.push('Very consistent monthly spending');
+    } else if (monthlyVariation > 0.3) {
+        patterns.push('Highly variable monthly spending');
+    }
+
+    return patterns;
+}
+
+// Calculate regularity score for spending pattern
+function calculateRegularityScore(analysis) {
+    let score = 0;
+    const maxScore = 100;
+
+    // Score based on transaction frequency consistency
+    const monthlyAmounts = Object.values(analysis.monthlyTotals);
+    const monthlyVariation = calculateVariation(monthlyAmounts);
+    score += (1 - monthlyVariation) * 40; // Up to 40 points for consistent monthly amounts
+
+    // Score based on timing patterns
+    const weekdayVariation = calculateVariation(analysis.weekdayTotals);
+    score += (1 - weekdayVariation) * 30; // Up to 30 points for consistent day-of-week patterns
+
+    // Score based on transaction amount consistency
+    const amounts = analysis.transactions.map(t => t.amount);
+    const amountVariation = calculateVariation(amounts);
+    score += (1 - amountVariation) * 30; // Up to 30 points for consistent transaction amounts
+
+    return Math.min(Math.max(score, 0), maxScore);
+}
+
+// Helper function to calculate coefficient of variation
+function calculateVariation(numbers) {
+    if (numbers.length < 2) return 0;
+    const mean = numbers.reduce((sum, n) => sum + n, 0) / numbers.length;
+    const variance = numbers.reduce((sum, n) => sum + Math.pow(n - mean, 2), 0) / numbers.length;
+    const stdDev = Math.sqrt(variance);
+    return mean === 0 ? 0 : stdDev / mean;
+}
+
+// Identify potential savings opportunities
+function identifySavingsOpportunities(analysis, avgAmount, patterns) {
+    const opportunities = [];
+    
+    // Check for high-value transactions that could be optimized
+    const highValueThreshold = avgAmount * 1.5;
+    const highValueTransactions = analysis.transactions
+        .filter(t => t.amount > highValueThreshold)
+        .length;
+    
+    if (highValueTransactions > 0) {
+        opportunities.push(
+            `Potential savings of ${formatCurrency(highValueThreshold * 0.2)} per transaction by optimizing ${highValueTransactions} high-value purchases`
+        );
+    }
+
+    // Check for frequent small transactions that could be bundled
+    const smallValueThreshold = avgAmount * 0.5;
+    const smallTransactions = analysis.transactions
+        .filter(t => t.amount < smallValueThreshold)
+        .length;
+    
+    if (smallTransactions >= 5) {
+        opportunities.push(
+            `Bundle ${smallTransactions} small transactions to save on transaction costs and potentially get bulk discounts`
+        );
+    }
+
+    // Identify potential timing-based savings
+    const weekdayTotals = analysis.weekdayTotals;
+    const maxWeekdaySpending = Math.max(...weekdayTotals);
+    const minWeekdaySpending = Math.min(...weekdayTotals.filter(amount => amount > 0));
+    
+    if (maxWeekdaySpending > minWeekdaySpending * 1.5) {
+        opportunities.push(
+            'Consider shifting some purchases to lower-spending days for better deals and discounts'
+        );
+    }
+
+    return opportunities;
+}
+
+// Generate smart recommendations based on spending patterns
+function generateSmartRecommendations(category, analysis, patterns, regularityScore, trend, avgAmount) {
+    const recommendations = [];
+    
+    // Recommendations based on spending regularity
+    if (regularityScore < 40) {
+        recommendations.push('Create a structured spending plan to improve consistency and predictability');
+    } else if (regularityScore > 80) {
+        recommendations.push('Your consistent spending pattern is ideal for automated budgeting and savings rules');
+    }
+
+    // Recommendations based on trend
+    if (trend > 0.1) {
+        recommendations.push(
+            `Set up spending alerts for transactions above ${formatCurrency(avgAmount)} to maintain control`
+        );
+    } else if (trend < -0.1) {
+        recommendations.push(
+            'Maintain your successful spending reduction strategy'
+        );
+    }
+
+    // Category-specific recommendations
+    switch (category.toLowerCase()) {
+        case 'groceries':
+            recommendations.push('Use a shopping list app to track essential items and avoid impulse purchases');
+            if (analysis.weekdayTotals[0] > 0 || analysis.weekdayTotals[6] > 0) {
+                recommendations.push('Consider shopping on weekdays for better deals and less crowded stores');
+            }
+            break;
+        case 'entertainment':
+            if (trend > 0) {
+                recommendations.push('Look for free or low-cost entertainment options in your area');
+            }
+            recommendations.push('Check for entertainment package deals or subscriptions to reduce per-event costs');
+            break;
+        case 'utilities':
+            if (trend > 0) {
+                recommendations.push('Consider a home energy audit to identify potential savings');
+            }
+            recommendations.push('Research off-peak usage discounts from your utility providers');
+            break;
+        case 'shopping':
+            recommendations.push('Create a wishlist and wait for sales on non-essential items');
+            if (patterns.some(p => p.includes('large transactions'))) {
+                recommendations.push('Research price trends and timing for major purchases');
+            }
+            break;
+        case 'transportation':
+            recommendations.push('Compare costs of different transportation options for your regular routes');
+            if (analysis.total > 1000) {
+                recommendations.push('Consider carpooling or public transit options to reduce costs');
+            }
+            break;
+        default:
+            if (analysis.count > 10) {
+                recommendations.push('Look for loyalty programs or bulk purchase options to reduce costs');
+            }
+    }
+
+    // Add personalized recommendation based on timing patterns
+    const timePatterns = patterns.find(p => p.includes('transactions during'));
+    if (timePatterns) {
+        recommendations.push('Consider adjusting purchase timing to take advantage of off-peak prices and promotions');
+    }
+
+    return recommendations.slice(0, 3); // Return top 3 most relevant recommendations
 }
 
 // Helper function to capitalize category
@@ -845,4 +1238,13 @@ function createChart() {
             }
         }
     });
+}
+
+// Format date
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
 } 

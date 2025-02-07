@@ -3,7 +3,7 @@ let transactions = [];
 
 // Helper function to get date for previous months
 function getDateForMonth(monthsAgo) {
-    const date = new Date('2025-02-15'); // Set base date to February 2025
+    const date = new Date();  // Use current date instead of fixed date
     date.setMonth(date.getMonth() - monthsAgo);
     return date.toISOString().split('T')[0];
 }
@@ -236,8 +236,43 @@ const monthlyRemainingElement = document.getElementById('monthly-remaining');
 
 // Set initial dates for filter
 const today = new Date();
-filterStartDate.value = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0];
-filterEndDate.value = new Date(today.getFullYear(), today.getMonth() + 1, 0).toISOString().split('T')[0];
+const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+// Format dates for input fields (dd-mm-yyyy)
+function formatDateForInput(date) {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${year}-${month}-${day}`; // Keep yyyy-mm-dd for input value
+}
+
+// Set default date for new transaction to today
+document.getElementById('transaction-date').value = formatDateForInput(today);
+
+// Set filter dates
+filterStartDate.value = formatDateForInput(firstDayOfMonth);
+filterEndDate.value = formatDateForInput(lastDayOfMonth);
+
+// Add event listener for date inputs to format display
+const dateInputs = document.querySelectorAll('input[type="date"]');
+dateInputs.forEach(input => {
+    // Set custom date format display
+    input.addEventListener('change', function() {
+        if (this.value) {
+            const date = new Date(this.value);
+            const formattedDate = formatDate(date);
+            this.setAttribute('data-date', formattedDate);
+        }
+    });
+    
+    // Format initial value if exists
+    if (input.value) {
+        const date = new Date(input.value);
+        const formattedDate = formatDate(date);
+        input.setAttribute('data-date', formattedDate);
+    }
+});
 
 // Initialize Chart
 let chart = null;
@@ -445,8 +480,11 @@ function updateTransactionsList() {
 
 // Format date
 function formatDate(dateString) {
-    const options = { year: 'numeric', month: 'short', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString(undefined, options);
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
 }
 
 // Delete transaction

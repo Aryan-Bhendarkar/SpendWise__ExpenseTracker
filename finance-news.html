@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpendWise - Financial News & Tips</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="finance-news.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Spend<span class="wise-gradient" data-text="Wise">Wise</span></h1>
+            <div class="subtitle-container">
+                <p class="subtitle">Financial News & Tips</p>
+            </div>
+            <nav class="main-nav">
+                <a href="index.html" class="nav-link">Dashboard</a>
+                <a href="insights.html" class="nav-link">Insights</a>
+                <a href="finance-news.html" class="nav-link active">News & Tips</a>
+            </nav>
+        </header>
+
+        <div class="news-grid">
+            <!-- Market Overview Section -->
+            <div class="market-section">
+                <h2>Market Overview</h2>
+                <div class="market-indicators" id="marketIndicators">
+                    <!-- Market indicators will be added dynamically -->
+                </div>
+            </div>
+
+            <!-- Latest News Section -->
+            <div class="news-section">
+                <div class="section-header">
+                    <h2>Latest Financial News</h2>
+                    <div class="news-filters">
+                        <button class="filter-btn active" data-category="all">All</button>
+                        <button class="filter-btn" data-category="market">Market</button>
+                        <button class="filter-btn" data-category="economy">Economy</button>
+                        <button class="filter-btn" data-category="personal">Personal Finance</button>
+                    </div>
+                </div>
+                <div class="news-container" id="newsContainer">
+                    <!-- News articles will be added dynamically -->
+                </div>
+            </div>
+
+            <!-- Financial Tips Section -->
+            <div class="tips-section">
+                <h2>Daily Financial Tips</h2>
+                <div class="tips-carousel" id="tipsCarousel">
+                    <!-- Tips will be added dynamically -->
+                </div>
+            </div>
+
+            <!-- Learning Resources -->
+            <div class="resources-section">
+                <h2>Learning Resources</h2>
+                <div class="resources-grid" id="resourcesGrid">
+                    <!-- Resources will be added dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Newsletter Subscription -->
+        <div class="newsletter-section">
+            <h2>Stay Updated</h2>
+            <p>Subscribe to our newsletter for daily financial tips and market updates</p>
+            <form id="newsletterForm" class="newsletter-form">
+                <input type="email" id="emailInput" placeholder="Enter your email" required>
+                <button type="submit" class="subscribe-btn">Subscribe</button>
+            </form>
+        </div>
+    </div>
+    <script src="finance-news.js"></script>
+</body>
+</html> 

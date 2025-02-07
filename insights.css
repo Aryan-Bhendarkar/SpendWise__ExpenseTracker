@@ -479,7 +479,7 @@
 .insight-item {
     background: linear-gradient(145deg, var(--darker-bg), var(--card-bg));
     padding: 20px;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     border-radius: var(--border-radius);
     border: 1px solid rgba(255, 255, 255, 0.05);
     box-shadow: var(--box-shadow);
@@ -495,15 +495,15 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 12px;
-    padding-bottom: 10px;
+    margin-bottom: 15px;
+    padding-bottom: 12px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .insight-category {
     color: var(--text-primary);
     font-weight: 600;
-    font-size: 1.05rem;
+    font-size: 1.1rem;
     letter-spacing: 0.5px;
 }
 
@@ -516,11 +516,130 @@
     font-weight: 600;
 }
 
-.insight-message {
+.insight-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.insight-details p {
     color: var(--text-secondary);
     font-size: 0.95rem;
+    margin: 0;
+}
+
+.insight-amount {
+    color: var(--text-primary) !important;
+    font-weight: 500;
+}
+
+.insight-regularity {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.insight-regularity::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--secondary-color);
+}
+
+.insight-patterns, .insight-recommendations, .savings-opportunities {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.insight-patterns h4, .insight-recommendations h4, .savings-opportunities h4 {
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin: 0 0 12px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.insight-patterns h4::before {
+    content: '📊';
+}
+
+.insight-recommendations h4::before {
+    content: '💡';
+}
+
+.savings-opportunities h4::before {
+    content: '💰';
+}
+
+.insight-patterns ul, .insight-recommendations ul, .savings-opportunities ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.insight-patterns li, .insight-recommendations li, .savings-opportunities li {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
     line-height: 1.5;
-    letter-spacing: 0.3px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.insight-patterns li:last-child, 
+.insight-recommendations li:last-child, 
+.savings-opportunities li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.insight-patterns li::before {
+    content: '•';
+    color: var(--secondary-color);
+}
+
+.insight-recommendations li::before {
+    content: '→';
+    color: var(--accent-color);
+}
+
+.savings-opportunities li::before {
+    content: '✓';
+    color: #2ecc71;
+}
+
+.insight-trend {
+    font-size: 0.85rem;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: rgba(0, 0, 0, 0.2);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.insight-trend.increasing {
+    color: #2ecc71;
+    background: rgba(46, 204, 113, 0.1);
+}
+
+.insight-trend.decreasing {
+    color: #e74c3c;
+    background: rgba(231, 76, 60, 0.1);
+}
+
+.insight-trend.stable {
+    color: #f1c40f;
+    background: rgba(241, 196, 15, 0.1);
 }
 
 /* Responsive Design */
@@ -546,5 +665,18 @@
 
     #healthScore {
         font-size: 2.5rem;
+    }
+
+    .insight-details {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .insight-item {
+        padding: 15px;
+    }
+    
+    .insight-patterns, .insight-recommendations, .savings-opportunities {
+        padding: 12px;
     }
 } 
