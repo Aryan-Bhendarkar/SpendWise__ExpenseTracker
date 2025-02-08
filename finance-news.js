@@ -1,5 +1,5 @@
-// API Key for Finnhub
-const FINNHUB_API_KEY = 'cuj62g1r01qm7p9ndn2gcuj62g1r01qm7p9ndn30';
+// API Keys
+const FINNHUB_API_KEY = 'cujens1r01qm7p9nvr00cujens1r01qm7p9nvr0g'; // Get your free API key from https://finnhub.io/
 
 // DOM Elements
 const marketIndicators = document.getElementById('marketIndicators');
@@ -7,393 +7,301 @@ const newsContainer = document.getElementById('newsContainer');
 const tipsCarousel = document.getElementById('tipsCarousel');
 const resourcesGrid = document.getElementById('resourcesGrid');
 const filterButtons = document.querySelectorAll('.filter-btn');
-const newsletterForm = document.getElementById('newsletterForm');
 
-// Market Data with both US and Indian markets
-const marketIndices = [
-    // Indian Indices
-    {
-        symbol: 'NSEI',
-        name: 'Nifty 50',
-        currency: 'INR',
-        isIndian: true,
-        sector: 'Index',
-        type: 'index'
-    },
-    {
-        symbol: 'BSESN',
-        name: 'BSE SENSEX',
-        currency: 'INR',
-        isIndian: true,
-        sector: 'Index',
-        type: 'index'
-    },
-    {
-        symbol: 'BANKNIFTY',
-        name: 'Bank Nifty',
-        currency: 'INR',
-        isIndian: true,
-        sector: 'Index',
-        type: 'index'
-    },
-    // Banking & Financial Services
-    {
-        symbol: 'HDFCBANK',
-        name: 'HDFC Bank',
-        currency: 'INR',
-        isIndian: true,
-        sector: 'Banking'
-    },
-    {
-        symbol: 'ICICIBANK',
-        name: 'ICICI Bank',
-        currency: 'INR',
-        isIndian: true,
-        sector: 'Banking'
-    },
-    {
-        symbol: 'SBIN',
-        name: 'State Bank of India',
-        currency: 'INR',
-        isIndian: true,
-        sector: 'Banking'
-    },
-    {
-        symbol: 'BAJFINANCE',
-        name: 'Bajaj Finance',
-        currency: 'INR',
-        isIndian: true,
-        sector: 'Financial Services'
-    },
-    // IT & Technology
-    {
-        symbol: 'TCS',
-        name: 'Tata Consultancy',
-        currency: 'INR',
-        isIndian: true,
-        sector: 'IT'
-    },
-    {
-        symbol: 'INFY',
-        name: 'Infosys',
-        currency: 'INR',
-        isIndian: true,
-        sector: 'IT'
-    },
-    {
-        symbol: 'WIPRO',
-        name: 'Wipro Ltd',
-        currency: 'INR',
-        isIndian: true,
-        sector: 'IT'
-    },
-    {
-        symbol: 'HCLTECH',
-        name: 'HCL Technologies',
-        currency: 'INR',
-        isIndian: true,
-        sector: 'IT'
-    },
-    // Energy & Oil
-    {
-        symbol: 'RELIANCE',
-        name: 'Reliance Industries',
-        currency: 'INR',
-        isIndian: true,
-        sector: 'Energy'
-    },
-    {
-        symbol: 'ONGC',
-        name: 'Oil & Natural Gas',
-        currency: 'INR',
-        isIndian: true,
-        sector: 'Energy'
-    },
-    {
-        symbol: 'POWERGRID',
-        name: 'Power Grid Corp',
-        currency: 'INR',
-        isIndian: true,
-        sector: 'Energy'
-    },
-    // Automotive
-    {
-        symbol: 'TATAMOTORS',
-        name: 'Tata Motors',
-        currency: 'INR',
-        isIndian: true,
-        sector: 'Automotive'
-    },
-    {
-        symbol: 'MARUTI',
-        name: 'Maruti Suzuki',
-        currency: 'INR',
-        isIndian: true,
-        sector: 'Automotive'
-    },
-    {
-        symbol: 'M&M',
-        name: 'Mahindra & Mahindra',
-        currency: 'INR',
-        isIndian: true,
-        sector: 'Automotive'
-    },
-    // Consumer Goods
-    {
-        symbol: 'HINDUNILVR',
-        name: 'Hindustan Unilever',
-        currency: 'INR',
-        isIndian: true,
-        sector: 'Consumer Goods'
-    },
-    {
-        symbol: 'ITC',
-        name: 'ITC Limited',
-        currency: 'INR',
-        isIndian: true,
-        sector: 'Consumer Goods'
-    },
-    {
-        symbol: 'NESTLEIND',
-        name: 'Nestle India',
-        currency: 'INR',
-        isIndian: true,
-        sector: 'Consumer Goods'
-    },
-    // Pharma & Healthcare
-    {
-        symbol: 'SUNPHARMA',
-        name: 'Sun Pharma',
-        currency: 'INR',
-        isIndian: true,
-        sector: 'Healthcare'
-    },
-    {
-        symbol: 'DRREDDY',
-        name: 'Dr Reddys Labs',
-        currency: 'INR',
-        isIndian: true,
-        sector: 'Healthcare'
-    },
-    {
-        symbol: 'DIVISLAB',
-        name: 'Divi\'s Labs',
-        currency: 'INR',
-        isIndian: true,
-        sector: 'Healthcare'
-    },
-    // US Market Section
-    { 
-        symbol: 'SPY',
-        name: 'S&P 500 ETF',
-        currency: 'USD',
-        isIndian: false,
-        sector: 'Index',
-        type: 'index'
-    },
-    { 
-        symbol: 'QQQ',
-        name: 'NASDAQ ETF',
-        currency: 'USD',
-        isIndian: false,
-        sector: 'Index',
-        type: 'index'
-    },
-    { 
-        symbol: 'AAPL',
-        name: 'Apple Inc.',
-        currency: 'USD',
-        isIndian: false,
-        sector: 'Technology'
-    },
-    { 
-        symbol: 'MSFT',
-        name: 'Microsoft',
-        currency: 'USD',
-        isIndian: false,
-        sector: 'Technology'
-    }
-];
-
-// Fallback market data for when API fails
-const fallbackData = {
-    'NSEI': { c: 22012.45, pc: 21982.80, o: 21990.15, h: 22039.25, l: 21961.70 },
-    'BSESN': { c: 72568.25, pc: 72470.30, o: 72485.60, h: 72650.40, l: 72380.15 },
-    'BANKNIFTY': { c: 46785.90, pc: 46650.25, o: 46670.80, h: 46820.35, l: 46580.45 },
-    'HDFCBANK': { c: 1475.60, pc: 1468.90, o: 1470.25, h: 1478.50, l: 1465.30 },
-    'ICICIBANK': { c: 1028.75, pc: 1022.40, o: 1024.50, h: 1030.80, l: 1020.15 },
-    'SBIN': { c: 628.45, pc: 625.80, o: 626.90, h: 630.25, l: 624.50 },
-    'BAJFINANCE': { c: 6890.25, pc: 6845.70, o: 6855.40, h: 6905.80, l: 6830.25 },
-    'TCS': { c: 3985.60, pc: 3965.30, o: 3970.45, h: 3990.80, l: 3960.25 },
-    'INFY': { c: 1565.80, pc: 1558.40, o: 1560.25, h: 1570.45, l: 1555.30 },
-    'WIPRO': { c: 485.25, pc: 482.90, o: 483.50, h: 486.70, l: 481.80 },
-    'HCLTECH': { c: 1685.40, pc: 1675.60, o: 1678.30, h: 1690.25, l: 1672.45 },
-    'RELIANCE': { c: 2890.75, pc: 2875.40, o: 2880.25, h: 2895.60, l: 2870.30 },
-    'ONGC': { c: 275.60, pc: 273.80, o: 274.25, h: 276.90, l: 273.15 },
-    'POWERGRID': { c: 285.45, pc: 283.70, o: 284.15, h: 286.80, l: 283.20 },
-    'TATAMOTORS': { c: 985.25, pc: 978.60, o: 980.45, h: 988.70, l: 976.30 },
-    'MARUTI': { c: 10245.80, pc: 10180.40, o: 10195.60, h: 10280.35, l: 10165.25 },
-    'M&M': { c: 1685.40, pc: 1675.60, o: 1678.90, h: 1690.25, l: 1672.45 },
-    'HINDUNILVR': { c: 2485.60, pc: 2475.30, o: 2478.45, h: 2490.80, l: 2470.25 },
-    'ITC': { c: 428.75, pc: 426.40, o: 427.25, h: 430.60, l: 425.80 },
-    'NESTLEIND': { c: 24850.60, pc: 24780.30, o: 24805.45, h: 24890.80, l: 24760.25 },
-    'SUNPHARMA': { c: 1385.45, pc: 1378.60, o: 1380.25, h: 1390.70, l: 1375.30 },
-    'DRREDDY': { c: 5785.60, pc: 5755.30, o: 5765.45, h: 5795.80, l: 5745.25 },
-    'DIVISLAB': { c: 3685.75, pc: 3665.40, o: 3670.25, h: 3695.60, l: 3660.30 },
-    'SPY': { c: 508.75, pc: 506.40, o: 507.25, h: 509.60, l: 505.80 },
-    'QQQ': { c: 438.60, pc: 436.30, o: 437.45, h: 439.80, l: 435.25 },
-    'AAPL': { c: 185.85, pc: 184.60, o: 185.25, h: 186.70, l: 184.30 },
-    'MSFT': { c: 415.45, pc: 413.60, o: 414.25, h: 416.90, l: 413.15 }
+// Market Data Configuration
+const marketIndices = {
+    us: [
+        { symbol: 'SPY', name: 'S&P 500 ETF', type: 'index', currency: 'USD', description: 'Tracks 500 largest US companies' },
+        { symbol: 'QQQ', name: 'NASDAQ ETF', type: 'index', currency: 'USD', description: 'Tracks 100 largest non-financial companies' },
+        { symbol: 'AAPL', name: 'Apple Inc.', sector: 'Technology', currency: 'USD', description: 'Consumer electronics & software' },
+        { symbol: 'MSFT', name: 'Microsoft', sector: 'Technology', currency: 'USD', description: 'Software & cloud services' },
+        { symbol: 'GOOGL', name: 'Alphabet Inc.', sector: 'Technology', currency: 'USD', description: 'Internet services & AI' },
+        { symbol: 'TSLA', name: 'Tesla, Inc.', sector: 'Automotive', currency: 'USD', description: 'Electric vehicles & clean energy' }
+    ]
 };
 
-// Initialize the page
-async function init() {
-    await Promise.all([
-        fetchMarketData(),
-        fetchFinancialNews(),
-        loadFinancialTips(),
-        loadResources()
-    ]);
+// Function to check if API keys are configured
+function checkAPIKeys() {
+    if (!FINNHUB_API_KEY) {
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'error-message';
+        errorDiv.innerHTML = `
+            <p>⚠️ Missing Finnhub API Key</p>
+            <p>Please follow these steps to get your API key:</p>
+            <ol>
+                <li>
+                    <strong>Finnhub (US Markets):</strong>
+                    <ul>
+                        <li>Visit <a href="https://finnhub.io/" target="_blank">Finnhub</a></li>
+                        <li>Click "Sign Up" and create an account</li>
+                        <li>Get your API key from the dashboard</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Update the code:</strong>
+                    <ul>
+                        <li>Open finance-news.js</li>
+                        <li>Replace the empty API key string with your Finnhub key</li>
+                    </ul>
+                </li>
+            </ol>
+        `;
+        marketIndicators.innerHTML = '';
+        marketIndicators.appendChild(errorDiv);
+        return false;
+    }
+    return true;
 }
 
-// Fetch Market Data with fallback
-async function fetchMarketData() {
+// Function to fetch US market data from Finnhub
+async function fetchUSMarketData(symbol) {
     try {
-        marketIndicators.classList.add('loading');
-        marketIndicators.innerHTML = '<p>Loading market data...</p>';
+        const response = await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${FINNHUB_API_KEY}`);
+        if (!response.ok) throw new Error(`Failed to fetch data for ${symbol}`);
         
-        const promises = marketIndices.map(async index => {
-            try {
-                // Try to fetch from API first
-                const quoteResponse = await fetch(`https://finnhub.io/api/v1/quote?symbol=${index.symbol}&token=${FINNHUB_API_KEY}`);
-                if (!quoteResponse.ok) {
-                    throw new Error(`Failed to fetch quote data for ${index.symbol}`);
-                }
-                const quoteData = await quoteResponse.json();
-                
-                // Check if we got valid quote data
-                if (!quoteData.c || quoteData.c === 0) {
-                    throw new Error(`Invalid quote data for ${index.symbol}`);
-                }
-                
-                return { 
-                    ...index, 
-                    quote: quoteData,
-                    company: {},
-                    usedFallback: false
-                };
-            } catch (error) {
-                console.warn(`Using fallback data for ${index.symbol}:`, error);
-                // Use fallback data
-                return {
-                    ...index,
-                    quote: fallbackData[index.symbol],
-                    company: {},
-                    usedFallback: true
-                };
-            }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error(`Error fetching US market data for ${symbol}:`, error);
+        return null;
+    }
+}
+
+// Function to fetch historical data
+async function fetchHistoricalData(symbol) {
+    try {
+        const endDate = Math.floor(Date.now() / 1000);
+        const startDate = endDate - (30 * 24 * 60 * 60); // 30 days ago
+        const resolution = 'D'; // Daily candles
+
+        const response = await fetch(
+            `https://finnhub.io/api/v1/stock/candle?symbol=${symbol}&resolution=${resolution}&from=${startDate}&to=${endDate}&token=${FINNHUB_API_KEY}`
+        );
+        
+        if (!response.ok) throw new Error(`Failed to fetch historical data for ${symbol}`);
+        return await response.json();
+    } catch (error) {
+        console.error(`Error fetching historical data for ${symbol}:`, error);
+        return null;
+    }
+}
+
+// Initialize the page with enhanced error handling
+async function init() {
+    try {
+        // First check if API keys are configured
+        if (!checkAPIKeys()) {
+            return; // Stop initialization if API keys are missing
+        }
+
+        // Load static content
+        loadFinancialTips();
+        loadResources();
+        
+        // Show loading state
+        marketIndicators.classList.add('loading');
+
+        // Show loading message
+        const warningDiv = document.createElement('div');
+        warningDiv.className = 'fallback-warning';
+        warningDiv.innerHTML = `
+            <p>⚠️ Loading market data... This may take a few moments.</p>
+        `;
+        marketIndicators.appendChild(warningDiv);
+
+        // Fetch both current and historical data
+        const usData = await Promise.all(
+            marketIndices.us.map(async (index) => {
+                const [quote, historical] = await Promise.all([
+                    fetchUSMarketData(index.symbol),
+                    fetchHistoricalData(index.symbol)
+                ]);
+                return { ...index, quote, historical };
+            })
+        );
+
+        // Filter out failed requests
+        const validUSData = usData.filter(item => item.quote);
+
+        // Display data
+        displayMarketData({
+            us: validUSData
         });
 
-        const results = await Promise.all(promises);
-        displayMarketData(results);
-        
-        // Show warning if using fallback data
-        const usedFallback = results.some(result => result.usedFallback);
-        if (usedFallback) {
-            showFallbackWarning();
-        }
+        // Fetch and display news
+        await fetchAndDisplayNews();
+
     } catch (error) {
-        console.error('Error fetching market data:', error);
-        // Use all fallback data if everything fails
-        const fallbackResults = marketIndices.map(index => ({
-            ...index,
-            quote: fallbackData[index.symbol],
-            company: {},
-            usedFallback: true
-        }));
-        displayMarketData(fallbackResults);
-        showFallbackWarning();
+        console.error('Error initializing page:', error);
+        handleError(error);
     } finally {
         marketIndicators.classList.remove('loading');
     }
 }
 
-// Display Market Data with enhanced information
-function displayMarketData(data) {
-    // First show indices
-    const indices = data.filter(item => item.type === 'index' && item.isIndian);
-    
-    // Group other Indian stocks by sector
-    const indianStocks = data.filter(item => item.isIndian && !item.type);
-    const sectors = [...new Set(indianStocks.map(item => item.sector))];
-    
-    // US markets
-    const usMarkets = data.filter(item => !item.isIndian);
+// Fetch and display news with improved filtering
+async function fetchAndDisplayNews(category = 'general') {
+    try {
+        newsContainer.classList.add('loading');
+        
+        // Map filter categories to Finnhub categories
+        const categoryMap = {
+            'all': 'general',
+            'market': 'forex',
+            'economy': 'general',
+            'personal': 'general'  // Changed to general to get broader results
+        };
 
-    let html = `
-        <div class="market-section-title">Indian Indices</div>
-        <div class="market-grid">
-            ${renderMarketItems(indices)}
-        </div>
+        const finnhubCategory = categoryMap[category] || 'general';
+        const response = await fetch(`https://finnhub.io/api/v1/news?category=${finnhubCategory}&token=${FINNHUB_API_KEY}`);
+        if (!response.ok) throw new Error('Failed to fetch news');
+        
+        const articles = await response.json();
+        
+        // Enhanced filtering logic
+        let filteredArticles = articles;
+        if (category !== 'all') {
+            filteredArticles = articles.filter(article => {
+                const searchText = (article.headline + ' ' + article.summary + ' ' + article.category).toLowerCase();
+                switch (category) {
+                    case 'market':
+                        return searchText.includes('market') || searchText.includes('trading') || 
+                               searchText.includes('stocks') || searchText.includes('shares');
+                    case 'economy':
+                        return searchText.includes('economy') || searchText.includes('gdp') || 
+                               searchText.includes('inflation') || searchText.includes('federal reserve');
+                    case 'personal':
+                        return searchText.includes('personal finance') || searchText.includes('savings') || 
+                               searchText.includes('investment') || searchText.includes('retirement') ||
+                               searchText.includes('credit') || searchText.includes('debt') ||
+                               searchText.includes('budget') || searchText.includes('personal wealth');
+                    default:
+                        return true;
+                }
+            });
+        }
+        
+        displayNews(filteredArticles.slice(0, 15)); // Show more articles
+    } catch (error) {
+        console.error('Error fetching news:', error);
+        handleError(error);
+    } finally {
+        newsContainer.classList.remove('loading');
+    }
+}
+
+// Enhanced error handling
+function handleError(error) {
+    const errorMessage = document.createElement('div');
+    errorMessage.className = 'error-message';
+    errorMessage.innerHTML = `
+        <p>⚠️ Error loading data: ${error.message}</p>
+        <p>This might be due to:</p>
+        <ul>
+            <li>API rate limits</li>
+            <li>Network connectivity issues</li>
+            <li>Invalid API key</li>
+        </ul>
+        <button onclick="retryFetch()" class="retry-button">Retry</button>
     `;
+    
+    if (error.message.includes('market')) {
+        marketIndicators.innerHTML = '';
+        marketIndicators.appendChild(errorMessage);
+    } else if (error.message.includes('news')) {
+        newsContainer.innerHTML = '';
+        newsContainer.appendChild(errorMessage);
+    }
+}
 
-    // Add each sector
-    sectors.forEach(sector => {
-        const sectorStocks = indianStocks.filter(item => item.sector === sector);
-        html += `
-            <div class="market-section-title">${sector}</div>
+// Add retry functionality
+async function retryFetch() {
+    try {
+        await Promise.all([
+            fetchAndDisplayMarketData(),
+            fetchAndDisplayNews()
+        ]);
+    } catch (error) {
+        console.error('Error retrying fetch:', error);
+        handleError(error);
+    }
+}
+
+// Display Market Data with historical context
+function displayMarketData(data) {
+    const { us } = data;
+    
+    let html = `
+        <div class="market-section">
+            <h2 class="market-section-title">US Markets</h2>
             <div class="market-grid">
-                ${renderMarketItems(sectorStocks)}
+                ${renderMarketItems(us)}
             </div>
-        `;
-    });
-
-    // Add US markets
-    html += `
-        <div class="market-section-title">US Markets</div>
-        <div class="market-grid">
-            ${renderMarketItems(usMarkets)}
         </div>
     `;
 
     marketIndicators.innerHTML = html;
 }
 
-// Helper function to render market items
+// Helper function to render market items with historical data
 function renderMarketItems(items) {
     return items.map(item => {
-        const price = item.quote.c;
-        const previousClose = item.quote.pc;
-        const change = price - previousClose;
-        const percentChange = (change / previousClose) * 100;
-        const isPositive = change > 0;
-        const currencySymbol = item.currency === 'INR' ? '₹' : '$';
+        const quote = item.quote;
+        const historical = item.historical;
+        
+        if (!quote) {
+            return `
+                <div class="market-indicator error">
+                    <div class="indicator-header">
+                        <div class="indicator-title">${item.name}</div>
+                        <div class="indicator-symbol">${item.symbol}</div>
+                    </div>
+                    <div class="error-message">Unable to load data</div>
+                </div>
+            `;
+        }
 
+        const price = quote.c;
+        const previousClose = quote.pc;
+        const change = quote.change || (price - previousClose);
+        const percentChange = quote.changePercent || ((change / previousClose) * 100);
+        const historicalChanges = historical ? calculateChange(historical) : null;
+        
         return `
             <div class="market-indicator">
                 <div class="indicator-header">
                     <div class="indicator-title">
                         ${item.name}
-                        ${item.company.logo ? `<img src="${item.company.logo}" alt="${item.name} logo" class="company-logo">` : ''}
+                        <span class="indicator-description">${item.description}</span>
                     </div>
                     <div class="indicator-symbol">${item.symbol}</div>
                 </div>
-                <div class="indicator-value">${currencySymbol}${price.toFixed(2)}</div>
-                <div class="indicator-change ${isPositive ? 'change-positive' : 'change-negative'}">
-                    ${isPositive ? '↑' : '↓'} ${currencySymbol}${Math.abs(change).toFixed(2)} (${Math.abs(percentChange).toFixed(2)}%)
+                <div class="indicator-value">$${Number(price).toFixed(2)}</div>
+                <div class="indicator-changes">
+                    <div class="indicator-change ${change >= 0 ? 'change-positive' : 'change-negative'}">
+                        Today: ${change >= 0 ? '↑' : '↓'} $${Math.abs(change).toFixed(2)} (${Math.abs(percentChange).toFixed(2)}%)
+                    </div>
+                    ${historicalChanges ? `
+                        <div class="indicator-change ${historicalChanges.weeklyChange >= 0 ? 'change-positive' : 'change-negative'}">
+                            Week: ${historicalChanges.weeklyChange >= 0 ? '↑' : '↓'} ${Math.abs(historicalChanges.weeklyChange).toFixed(2)}%
+                        </div>
+                        <div class="indicator-change ${historicalChanges.monthlyChange >= 0 ? 'change-positive' : 'change-negative'}">
+                            Month: ${historicalChanges.monthlyChange >= 0 ? '↑' : '↓'} ${Math.abs(historicalChanges.monthlyChange).toFixed(2)}%
+                        </div>
+                    ` : ''}
                 </div>
                 <div class="indicator-details">
                     <div class="detail-item">
                         <span>Open:</span>
-                        <span>${currencySymbol}${item.quote.o.toFixed(2)}</span>
+                        <span>$${Number(quote.o).toFixed(2)}</span>
                     </div>
                     <div class="detail-item">
                         <span>High:</span>
-                        <span>${currencySymbol}${item.quote.h.toFixed(2)}</span>
+                        <span>$${Number(quote.h).toFixed(2)}</span>
                     </div>
                     <div class="detail-item">
                         <span>Low:</span>
-                        <span>${currencySymbol}${item.quote.l.toFixed(2)}</span>
+                        <span>$${Number(quote.l).toFixed(2)}</span>
                     </div>
                 </div>
             </div>
@@ -401,48 +309,23 @@ function renderMarketItems(items) {
     }).join('');
 }
 
-// Fetch Financial News using Finnhub
-async function fetchFinancialNews(category = 'general') {
-    try {
-        newsContainer.classList.add('loading');
-        
-        // Get current date and date from 7 days ago
-        const toDate = Math.floor(Date.now() / 1000);
-        const fromDate = toDate - (7 * 24 * 60 * 60); // 7 days ago
-        
-        let query = '';
-        switch(category) {
-            case 'market':
-                query = 'stock market';
-                break;
-            case 'economy':
-                query = 'economy';
-                break;
-            case 'personal':
-                query = 'personal finance';
-                break;
-            default:
-                query = 'finance';
-        }
-        
-        const response = await fetch(`https://finnhub.io/api/v1/news?category=general&token=${FINNHUB_API_KEY}`);
-        const articles = await response.json();
-        
-        // Filter articles based on category if needed
-        const filteredArticles = category === 'all' 
-            ? articles 
-            : articles.filter(article => 
-                article.category.toLowerCase().includes(category) ||
-                article.headline.toLowerCase().includes(query)
-              );
-        
-        displayNews(filteredArticles);
-    } catch (error) {
-        console.error('Error fetching news:', error);
-        newsContainer.innerHTML = '<p class="error">Failed to load news</p>';
-    } finally {
-        newsContainer.classList.remove('loading');
-    }
+// Helper function to calculate price change and trend
+function calculateChange(historicalData) {
+    if (!historicalData || !historicalData.c || historicalData.c.length < 2) return null;
+    
+    const prices = historicalData.c;
+    const current = prices[prices.length - 1];
+    const weekAgo = prices[prices.length - 6] || prices[0];
+    const monthAgo = prices[0];
+    
+    return {
+        weeklyChange: ((current - weekAgo) / weekAgo) * 100,
+        monthlyChange: ((current - monthAgo) / monthAgo) * 100,
+        trend: prices.slice(-7).map((price, index) => ({
+            day: index,
+            price: price
+        }))
+    };
 }
 
 // Display News Articles
@@ -472,117 +355,352 @@ function formatDate(timestamp) {
     });
 }
 
-// Financial Tips Data
+// Financial Tips Data with categories
 const financialTips = [
     {
         icon: '💰',
         title: '50/30/20 Rule',
-        content: 'Allocate 50% of your income to needs, 30% to wants, and 20% to savings and debt repayment.'
+        content: 'Allocate 50% of your income to needs, 30% to wants, and 20% to savings and debt repayment.',
+        category: 'budgeting'
     },
     {
         icon: '🎯',
         title: 'Emergency Fund',
-        content: 'Aim to save 3-6 months of living expenses in an easily accessible emergency fund.'
+        content: 'Aim to save 3-6 months of living expenses in an easily accessible emergency fund.',
+        category: 'savings'
     },
     {
         icon: '📊',
         title: 'Diversification',
-        content: 'Don\'t put all your eggs in one basket. Spread your investments across different asset classes.'
+        content: 'Don\'t put all your eggs in one basket. Spread your investments across different asset classes.',
+        category: 'investing'
     },
     {
         icon: '💳',
         title: 'Credit Score',
-        content: 'Maintain a good credit score by paying bills on time and keeping credit utilization below 30%.'
+        content: 'Maintain a good credit score by paying bills on time and keeping credit utilization below 30%.',
+        category: 'credit'
     },
     {
         icon: '📈',
         title: 'Compound Interest',
-        content: 'Start investing early to take advantage of compound interest over time.'
+        content: 'Start investing early to take advantage of compound interest over time.',
+        category: 'investing'
+    },
+    {
+        icon: '🏦',
+        title: 'Automate Savings',
+        content: 'Set up automatic transfers to your savings account on payday to ensure consistent saving.',
+        category: 'savings'
+    },
+    {
+        icon: '📱',
+        title: 'Track Expenses',
+        content: 'Use budgeting apps to track your daily expenses and identify areas where you can cut back.',
+        category: 'budgeting'
+    },
+    {
+        icon: '🎓',
+        title: 'Student Loans',
+        content: 'Consider refinancing student loans when interest rates are low to save money over time.',
+        category: 'debt'
+    },
+    {
+        icon: '🏠',
+        title: 'Housing Costs',
+        content: 'Keep housing costs below 30% of your monthly income for better financial stability.',
+        category: 'budgeting'
+    },
+    {
+        icon: '🛡️',
+        title: 'Insurance Coverage',
+        content: 'Review your insurance policies annually to ensure adequate coverage at competitive rates.',
+        category: 'protection'
     }
 ];
 
-// Load Financial Tips
-function loadFinancialTips() {
-    tipsCarousel.innerHTML = financialTips.map(tip => `
-        <div class="tip-card">
-            <div class="tip-header">
-                <span class="tip-icon">${tip.icon}</span>
-                <h3 class="tip-title">${tip.title}</h3>
-            </div>
-            <p class="tip-content">${tip.content}</p>
-        </div>
-    `).join('');
+// Function to get today's tip based on date
+function getTodaysTip() {
+    const today = new Date();
+    const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
+    return financialTips[dayOfYear % financialTips.length];
 }
+
+// Function to get random tips excluding today's tip
+function getRandomTips(count) {
+    const todaysTip = getTodaysTip();
+    const otherTips = financialTips.filter(tip => tip !== todaysTip);
+    const shuffled = otherTips.sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, count);
+}
+
+// Load Financial Tips with daily update feature
+function loadFinancialTips() {
+    const todaysTip = getTodaysTip();
+    const additionalTips = getRandomTips(2); // Get 2 additional random tips
+    
+    tipsCarousel.innerHTML = `
+        <div class="tips-header">
+            <h3>Tip of the Day</h3>
+            <span class="tips-date">${formatDate(new Date())}</span>
+        </div>
+        <div class="tip-card featured">
+            <div class="tip-header">
+                <span class="tip-icon">${todaysTip.icon}</span>
+                <h3 class="tip-title">${todaysTip.title}</h3>
+                <span class="tip-category">${todaysTip.category}</span>
+            </div>
+            <p class="tip-content">${todaysTip.content}</p>
+        </div>
+        <div class="more-tips">
+            <h3>More Tips</h3>
+            <div class="tips-grid">
+                ${additionalTips.map(tip => `
+                    <div class="tip-card">
+                        <div class="tip-header">
+                            <span class="tip-icon">${tip.icon}</span>
+                            <h3 class="tip-title">${tip.title}</h3>
+                            <span class="tip-category">${tip.category}</span>
+                        </div>
+                        <p class="tip-content">${tip.content}</p>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+        <div class="tips-controls">
+            <button onclick="refreshTips()" class="refresh-tips-btn">
+                <span class="refresh-icon">🔄</span> Show More Tips
+            </button>
+        </div>
+    `;
+}
+
+// Function to refresh tips
+function refreshTips() {
+    const newTips = getRandomTips(2);
+    const tipsGrid = document.querySelector('.tips-grid');
+    
+    if (tipsGrid) {
+        tipsGrid.innerHTML = newTips.map(tip => `
+            <div class="tip-card">
+                <div class="tip-header">
+                    <span class="tip-icon">${tip.icon}</span>
+                    <h3 class="tip-title">${tip.title}</h3>
+                    <span class="tip-category">${tip.category}</span>
+                </div>
+                <p class="tip-content">${tip.content}</p>
+            </div>
+        `).join('');
+    }
+}
+
+// Add this to your existing CSS (finance-news.css)
+const tipStyles = `
+.tips-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.tips-date {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.tip-card.featured {
+    background: linear-gradient(145deg, var(--primary-color), var(--secondary-color));
+    transform: scale(1.02);
+}
+
+.tip-category {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.tips-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.tips-controls {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.refresh-tips-btn {
+    background: var(--darker-bg);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.refresh-tips-btn:hover {
+    background: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.refresh-icon {
+    font-size: 1.2rem;
+}
+`;
+
+// Add styles to the document
+const styleSheet = document.createElement('style');
+styleSheet.textContent = tipStyles;
+document.head.appendChild(styleSheet);
 
 // Learning Resources Data
 const resources = [
     {
         title: 'Budgeting Basics',
-        description: 'Learn the fundamentals of creating and maintaining a budget.',
-        link: '#'
+        description: 'Learn the fundamentals of creating and maintaining a budget with practical tips and templates.',
+        link: 'https://www.investopedia.com/personal-finance-4427760',
+        source: 'Investopedia'
     },
     {
         title: 'Investment 101',
-        description: 'Understanding different investment options and strategies.',
-        link: '#'
+        description: 'A comprehensive guide to understanding different investment options and building a balanced portfolio.',
+        link: 'https://www.nerdwallet.com/article/investing/how-to-start-investing',
+        source: 'NerdWallet'
     },
     {
         title: 'Debt Management',
-        description: 'Strategies for managing and reducing debt effectively.',
-        link: '#'
+        description: 'Expert strategies for managing and reducing debt, including debt avalanche and snowball methods.',
+        link: 'https://www.bankrate.com/personal-finance/debt/what-is-debt-management/',
+        source: 'Bankrate'
     },
     {
         title: 'Retirement Planning',
-        description: 'Planning for a secure financial future.',
-        link: '#'
+        description: 'Essential guide to planning for retirement at any age with practical steps and calculators.',
+        link: 'https://www.nerdwallet.com/h/category/retirement-planning?trk=nw_gn_6.0',
+        source: 'NerdWallet'
+    },
+    {
+        title: 'Emergency Fund Guide',
+        description: 'Learn how to build and maintain an emergency fund to protect your financial future.',
+        link: 'https://www.nerdwallet.com/article/banking/emergency-fund-why-it-matters',
+        source: 'NerdWallet'
+    },
+    {
+        title: 'Tax Planning Basics',
+        description: 'Understanding tax basics and strategies to optimize your tax situation.',
+        link: 'https://www.nerdwallet.com/h/category/tax-strategy-planning?trk=nw_gn_6.0',
+        source: 'NerdWallet'
     }
 ];
 
-// Load Learning Resources
+// Load Learning Resources with enhanced display
 function loadResources() {
     resourcesGrid.innerHTML = resources.map(resource => `
         <div class="resource-card">
             <h3 class="resource-title">${resource.title}</h3>
             <p class="resource-description">${resource.description}</p>
-            <a href="${resource.link}" class="resource-link">Learn More →</a>
+            <div class="resource-footer">
+                <span class="resource-source">Source: ${resource.source}</span>
+                <a href="${resource.link}" target="_blank" rel="noopener noreferrer" class="resource-link">
+                    Read Article <span class="arrow">→</span>
+                </a>
+            </div>
         </div>
     `).join('');
 }
 
+// Add new styles for enhanced resource cards
+const resourceStyles = `
+.resource-card {
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.resource-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.resource-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.resource-card:hover::before {
+    opacity: 1;
+}
+
+.resource-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.resource-source {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.resource-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.3s ease;
+}
+
+.resource-link:hover {
+    color: var(--secondary-color);
+}
+
+.resource-link .arrow {
+    transition: transform 0.3s ease;
+}
+
+.resource-link:hover .arrow {
+    transform: translateX(5px);
+}
+`;
+
+// Add resource styles to the document
+const resourceStyleSheet = document.createElement('style');
+resourceStyleSheet.textContent = resourceStyles;
+document.head.appendChild(resourceStyleSheet);
+
 // Event Listeners
 filterButtons.forEach(button => {
     button.addEventListener('click', () => {
+        const category = button.getAttribute('data-category');
         filterButtons.forEach(btn => btn.classList.remove('active'));
         button.classList.add('active');
-        fetchFinancialNews(button.dataset.category);
+        fetchAndDisplayNews(category);
     });
 });
 
-newsletterForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = document.getElementById('emailInput').value;
-    
-    // Here you would typically send this to your backend
-    console.log('Newsletter subscription:', email);
-    alert('Thank you for subscribing!');
-    newsletterForm.reset();
-});
-
-// Auto-refresh market data every 5 minutes
-setInterval(fetchMarketData, 300000);
-
 // Initialize the page
-init();
-
-// Show warning for fallback data
-function showFallbackWarning() {
-    const warningDiv = document.createElement('div');
-    warningDiv.className = 'fallback-warning';
-    warningDiv.innerHTML = `
-        <p>⚠️ Using demo market data. For real-time data, please add your Finnhub API key.</p>
-        <button onclick="fetchMarketData()" class="retry-button">Retry with API</button>
-    `;
-    
-    // Insert warning at the top of market section
-    marketIndicators.insertBefore(warningDiv, marketIndicators.firstChild);
-} 
+init(); 

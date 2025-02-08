@@ -59,98 +59,139 @@
 
 .market-indicator {
     background: linear-gradient(145deg, var(--darker-bg), var(--card-bg));
+    border-radius: 12px;
     padding: 25px;
-    border-radius: var(--border-radius);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .market-indicator:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
 }
 
 .indicator-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .indicator-title {
-    font-size: 1.1rem;
-    color: var(--text-primary);
+    font-size: 1.2rem;
     font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    color: var(--text-primary);
 }
 
-.company-logo {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    object-fit: cover;
+.indicator-description {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-top: 6px;
+    font-weight: normal;
+    line-height: 1.4;
 }
 
 .indicator-symbol {
     font-size: 0.9rem;
     color: var(--text-secondary);
-    padding: 4px 8px;
     background: rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.indicator-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.price-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .indicator-value {
-    font-size: 1.8rem;
+    font-size: 2rem;
     font-weight: 700;
     color: var(--text-primary);
-    margin: 15px 0;
+    letter-spacing: -0.5px;
 }
 
-.indicator-change {
+.main-change {
     font-size: 1.1rem;
     font-weight: 600;
-    margin-bottom: 15px;
-    padding: 8px 12px;
+    padding: 6px 12px;
     border-radius: 6px;
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.historical-changes {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.change-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    min-width: 80px;
+}
+
+.change-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+.change-value {
+    font-size: 0.95rem;
+    font-weight: 600;
 }
 
 .change-positive {
-    color: var(--income-color);
-    background: rgba(46, 204, 113, 0.1);
+    color: #4caf50;
 }
 
 .change-negative {
-    color: var(--expense-color);
-    background: rgba(231, 76, 60, 0.1);
+    color: #f44336;
 }
 
 .indicator-details {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-top: 15px;
-    padding-top: 15px;
+    gap: 15px;
+    padding-top: 20px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .detail-item {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 6px;
 }
 
-.detail-item span:first-child {
+.detail-label {
     font-size: 0.85rem;
     color: var(--text-secondary);
+    font-weight: 500;
 }
 
-.detail-item span:last-child {
+.detail-value {
     font-size: 1rem;
     color: var(--text-primary);
-    font-weight: 500;
+    font-weight: 600;
 }
 
 /* News Section */
@@ -204,6 +245,29 @@
     max-height: 600px;
     overflow-y: auto;
     padding-right: 10px;
+    scrollbar-width: thin;  /* For Firefox */
+    scrollbar-color: rgba(255, 255, 255, 0.1) transparent;  /* For Firefox */
+}
+
+/* Webkit scrollbar styles (Chrome, Safari, Edge) */
+.news-container::-webkit-scrollbar {
+    width: 6px;
+    background-color: transparent;
+}
+
+.news-container::-webkit-scrollbar-track {
+    background-color: transparent;
+    border-radius: 10px;
+}
+
+.news-container::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.news-container::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
 .news-item {
@@ -413,6 +477,20 @@
 
     .market-indicators {
         grid-template-columns: 1fr;
+    }
+
+    .indicator-main {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .historical-changes {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .change-item {
+        flex: 1;
     }
 }
 
