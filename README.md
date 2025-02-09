@@ -177,7 +177,7 @@ Project Maintainer: Aryan Bhendarkar
 - Mrinal Bhattacharya Sir
 ---
 <div align="center">
-  Made with ❤️ by Aryan
+  Made with ❤️ 
   <br>
-  © 2024 SpendWise. All rights reserved.
+  © 2025 SpendWise. All rights reserved.
 </div> 
