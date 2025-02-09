@@ -75,7 +75,7 @@ SpendWise/
 - **Storage Engine**: LocalStorage
 - **UI Framework**: Vanilla JavaScript with Custom Components
 - **Data Visualization**: Chart.js
-- **API Integration**: REST APIs with Fetch API
+- **API Integration**: Finnhub and Exchange Rates API
 
 ## 🚀 Special Features
 
@@ -174,7 +174,7 @@ Project Maintainer: Aryan Bhendarkar
 - [Exchange Rates API](https://exchangeratesapi.io/) - Currency conversion
 
 ### Special Thanks
-- Mrinal Bhattacharya
+- Mrinal Bhattacharya Sir
 ---
 <div align="center">
   Made with ❤️ by Aryan
