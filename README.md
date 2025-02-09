@@ -1,12 +1,7 @@
 # SpendWise - Track Smart, Save Smarter 💰
 
 <div align="center">
-  <img src="assets/favicon-preview.svg" alt="SpendWise Logo" width="120"/>
   <p><strong>Your Personal Finance Companion</strong></p>
-  
-  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-  ![Version](https://img.shields.io/badge/version-1.0.0-blue)
-  ![Status](https://img.shields.io/badge/status-active-success)
 </div>
 
 ## 📑 Table of Contents
@@ -14,12 +9,9 @@
 - [Key Features](#-key-features)
 - [Technical Architecture](#-technical-architecture)
 - [Special Features](#-special-features)
-- [Installation & Setup](#-installation--setup)
 - [Usage Guide](#-usage-guide)
 - [API Integration](#-api-integration)
-- [Browser Support](#-browser-support)
 - [Contributing](#-contributing)
-- [License](#-license)
 - [Contact](#-contact)
 
 ## 🌟 Overview
@@ -52,7 +44,7 @@ SpendWise is a sophisticated expense tracking application designed to revolution
   - Personalized improvement recommendations
 
 - **Predictive Analytics**
-  - Machine learning-based spending predictions
+  - Prediction made by looking into the past 3 months data 
   - Pattern recognition for recurring expenses
   - Anomaly detection in spending behavior
 
@@ -80,7 +72,7 @@ SpendWise/
 ```
 
 ### Key Components
-- **Storage Engine**: IndexedDB & LocalStorage
+- **Storage Engine**: LocalStorage
 - **UI Framework**: Vanilla JavaScript with Custom Components
 - **Data Visualization**: Chart.js
 - **API Integration**: REST APIs with Fetch API
@@ -126,48 +118,15 @@ class HealthScoreCalculator {
 - Historical rate tracking
 - Rate change notifications
 
-## 🔧 Installation & Setup
-
-### Prerequisites
-- Modern web browser (Chrome, Firefox, Safari, Edge)
-- Local development server (optional)
-- API keys for market data (optional)
-
-### Basic Setup
-1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/spendwise.git
-cd spendwise
-```
-
-2. Configure API Keys:
-```javascript
-// config.js
-const CONFIG = {
-    FINNHUB_API_KEY: 'your_api_key',
-    EXCHANGE_API_KEY: 'your_api_key'
-};
-```
-
-3. Launch the application:
-```bash
-# Using Python
-python -m http.server 8000
-
-# Using Node.js
-npx http-server
-
-# Using PHP
-php -S localhost:8000
-```
 
 ## 📱 Usage Guide
 
 ### First-Time Setup
-1. Set monthly budget
-2. Configure expense categories
-3. Add recurring transactions
-4. Set financial goals
+1. Go to :: https://aryan-bhendarkar.github.io/SpendWise__ExpenseTracker/
+2. Set monthly budget
+3. Configure expense categories
+4. Add recurring transactions
+5. Set financial goals
 
 ### Daily Usage
 1. Record transactions
@@ -187,14 +146,6 @@ php -S localhost:8000
 - Historical rates
 - Documentation: [Exchange Rates API](https://exchangeratesapi.io/documentation/)
 
-## 🌐 Browser Support
-
-| Browser | Version |
-|---------|---------|
-| Chrome  | >= 60   |
-| Firefox | >= 54   |
-| Safari  | >= 11   |
-| Edge    | >= 79   |
 
 ## 🤝 Contributing
 
@@ -206,18 +157,14 @@ We welcome contributions! Please follow these steps:
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
+PS :: If you have any ideas, feel free to connect with me on LinkedIn and share your thoughts😊.
 
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 📞 Contact
 
-Project Maintainer: [Your Name]
-- Email: [your.email@example.com]
-- LinkedIn: [Your LinkedIn Profile]
-- Twitter: [@YourHandle]
+Project Maintainer: Aryan Bhendarkar
+- Email: bhendarkararyan@gmail.com
+- LinkedIn: www.linkedin.com/in/aryan-bhendarkar-4335b3313
 
 ## 🙏 Acknowledgments
 
@@ -226,13 +173,11 @@ Project Maintainer: [Your Name]
 - [Finnhub](https://finnhub.io/) - Market data
 - [Exchange Rates API](https://exchangeratesapi.io/) - Currency conversion
 
-### Contributors
-- List of contributors
-- Special thanks
-
+### Special Thanks
+- Mrinal Bhattacharya
 ---
 <div align="center">
-  Made with ❤️ by SpendWise Team
+  Made with ❤️ by Aryan
   <br>
   © 2024 SpendWise. All rights reserved.
 </div> 
