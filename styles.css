@@ -1221,3 +1221,38 @@ input[type="date"]:invalid::-webkit-datetime-edit {
     border-radius: var(--border-radius);
     padding: 10px;
 }
+
+/* Footer Styles */
+.footer {
+    margin-top: 40px;
+    padding: 20px 0;
+    background: linear-gradient(145deg, var(--card-bg), var(--darker-bg));
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-content {
+    text-align: center;
+    color: var(--text-secondary);
+}
+
+.footer-content p {
+    margin: 5px 0;
+    font-size: 0.9rem;
+}
+
+.footer-content p:first-child {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+/* Responsive footer */
+@media (max-width: 768px) {
+    .footer {
+        margin-top: 30px;
+        padding: 15px 0;
+    }
+    
+    .footer-content p {
+        font-size: 0.85rem;
+    }
+}
