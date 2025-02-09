@@ -327,13 +327,24 @@ function getMonthlyData() {
     const today = new Date();
     const targetMonths = [];
     
-    // Get previous 3 months from today
-    for (let i = 3; i > 0; i--) {
-        const date = new Date(today);
-        date.setMonth(today.getMonth() - i);
+    // Get last 3 complete months
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+    
+    // Start from last complete month (current month - 1)
+    for (let i = 1; i <= 3; i++) {
+        let targetMonth = currentMonth - i;
+        let targetYear = currentYear;
+        
+        // Adjust year if we go back to previous year
+        if (targetMonth < 0) {
+            targetMonth += 12;
+            targetYear -= 1;
+        }
+        
         targetMonths.push({
-            month: date.getMonth(),
-            year: date.getFullYear()
+            month: targetMonth,
+            year: targetYear
         });
     }
 
@@ -346,7 +357,7 @@ function getMonthlyData() {
         const startOfMonth = new Date(year, month, 1);
         const endOfMonth = new Date(year, month + 1, 0, 23, 59, 59);
         
-        // Get month name
+        // Get month name and year
         const monthName = startOfMonth.toLocaleString('default', { month: 'short' });
         
         // Calculate income for the month
@@ -374,8 +385,7 @@ function getMonthlyData() {
         expenses.push(monthExpenses);
     });
 
-    console.log('Monthly Data:', { months, income, expenses });
-    return { labels: months, income, expenses };
+    return { months: months.reverse(), income: income.reverse(), expenses: expenses.reverse() };
 }
 
 // Create monthly comparison chart
@@ -393,7 +403,7 @@ function createMonthlyComparisonChart() {
     monthlyComparisonChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: monthlyData.labels,
+            labels: monthlyData.months,
             datasets: [{
                 label: 'Income',
                 data: monthlyData.income,
